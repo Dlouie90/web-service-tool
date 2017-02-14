@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="WebserviceApp">
+<head>
+    <meta charset="UTF-8">
+    <title>Web Service</title>
+
+    <!-- =============== JQUERY =============== -->
+    <script src="scripts/jquery/jquery.js"></script>
+
+    <!-- =============== Bootstrap =============== -->
+    <link rel="stylesheet" href="styles/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="styles/bootstrap/dist/css/bootstrap-theme.css">
+    <link rel="stylesheet" href="styles/carousel.css">
+    <script src="styles/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <!-- =============== AngularJS =============== -->
+    <script src="scripts/angularjs/angular.js"></script>
+    <script src="app.js"></script>
+
+    <!-- ng-modules -->
+    <script src="scripts/angularjs/angular-route.js"></script>
+
+    <!-- controllers -->
+    <script src="features/navbar/NavBarController.js"></script>
+    <script src="features/project/list/projectController.js"></script>
+
+    <!-- directives -->
+    <script src="features/navbar/NavBarDirective.js"></script>
+    <script src="features/carousel/carouselDirective.js"></script>
+    <script src="features/project/list/projectListDirective.js"></script>
+    <script src="features/project/active_widget/activeWidget.js"></script>
+    <script src="features/project/form/formDirective.js"></script>
+    <script src="features/project/info/projectInfoDirective.js"></script>
+
+    <!-- components -->
+    <script src="components/tabs/tabDirectives.js"></script>
+    <script src="components/confirm_box/confirmBoxDirective.js"></script>
+    <script src="components/debug/logDirective.js"></script>
+    <script src="components/visuals/barChartDirective.js"></script>
+    <script src="components/visuals/lineChartDirective.js"></script>
+    <script src="components/visuals/webserviceGuiDirective.js"></script>
+    <script src="components/visuals/scatterPlotDirectives.js"></script>
+    <script src="components/visuals/hBarChartDirective.js"></script>
+
+    <!-- filters -->
+    <script src="components/filters/customFilters.js"></script>
+
+    <!-- services -->
+    <script src="features/project/list/projectFactory.js"></script>
+    <script src="features/constants/constantFactory.js"></script>
+
+    <!-- =============== Stylesheet =============== -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/hover.css">
+    <link rel="stylesheet" href="styles/graphs.css">
+
+    <!-- =============== Font Awesome =============== -->
+    <link rel="stylesheet"
+          href="styles/font-awesome-4.6.3/css/font-awesome.css">
+
+    <!-- =============== D3 =============== -->
+    <script src="//d3js.org/d3.v3.min.js"></script>
+
+    <!-- =============== GRAPH =============== -->
+    <script src="components/visuals/graph.js"></script>
+</head>
+
+
+<body ng-controller="ProjectCtrl">
+
+<header>
+    <nav-bar></nav-bar>
+    <carosuel></carosuel>
+</header>
+
+<section>
+    <ng-view></ng-view>
+</section>
+
+<!-- =============== FOOTER =============== -->
+<footer class="container">
+    <hr>
+    <p class="pull-right"><a href="#">Back to top</a></p>
+    <p>&copy; 2016 Company, Inc. &middot; <a href="#">Privacy</a> &middot;
+        <a href="#">Terms</a></p>
+</footer>
+
+</body>
+
+
+</html>

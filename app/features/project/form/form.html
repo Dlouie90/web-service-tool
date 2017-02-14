@@ -1,0 +1,49 @@
+<br/>
+<form class="project-form" name="projectFrom" novalidate>
+    <!-- You will only see the project id if your editing an existing project
+    otherwise this div will be hidden -->
+    <div class="row form-group" ng-show="project.id">
+        <label class="col-sm-3">Project's ID</label>
+        <div class="col-sm-6">
+            <input name="id" class="form-control" ng-model="project.id"
+                   disabled>
+        </div>
+    </div>
+    <div class="row form-group">
+        <label class="col-sm-3">Project's Author:</label>
+        <div class="col-sm-6">
+            <input name="author" class="form-control" ng-model="project.author"
+                   required/>
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <label class="col-sm-3">Project's Name:</label>
+        <div class="col-sm-6">
+            <input name="name" class="form-control" ng-model="project.name"
+                   required/>
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <label class="col-sm-3">Project's Description:</label>
+        <div class="col-sm-6">
+            <input name="description" class="form-control"
+                   ng-model="project.description" required/>
+        </div>
+    </div>
+
+    <div ng-hide="project.id" class="col-sm-offset-3">
+        <button class="btn btn-default" type="reset">Reset</button>
+        <button class="btn btn-primary" ng-click="addProject(project)">
+            Add
+        </button>
+        <br/>
+
+        <!-- display a message when a project is created -->
+        <div ng-show="alertDisplayed"
+             class="col-sm-6 alert alert-success text-center" role="alert">
+            <strong>New Project Created!</strong>
+        </div>
+    </div>
+</form>

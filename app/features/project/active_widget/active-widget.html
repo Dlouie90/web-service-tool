@@ -1,0 +1,11 @@
+<!-- display the current active project name and its author -->
+<div class="navbar-right">
+    <div ng-show="getActiveProject().id" class="navbar-text">
+        <b>Current Active Project:</b>
+        <code ng-show="getActiveProject().name">{{getActiveProject().name}} by
+            {{getActiveProject().author}}</code>
+    </div>
+    <div ng-hide="getActiveProject().id" class="navbar-text">
+        <b>No Active Project</b>
+    </div>
+</div>

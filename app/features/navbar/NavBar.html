@@ -1,0 +1,23 @@
+<div class="container navbar-wrapper" ng-controller="NavBarCtrl">
+
+    <nav class="navbar navbar-inverse navbar-static-top">
+        <div class="container">
+            <!-- project title-->
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Web Service</a>
+            </div>
+            <!-- container for link tabs and active project widget -->
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav" ng-repeat="option in options">
+                    <li class="hvr-underline-from-center" ng-click="selectOption(option)"
+                        ng-class="getOptionClass(option)">
+                        <a ng-href="{{option.url}}">{{option.name}}</a>
+                    </li>
+                </ul>
+                <!-- a widget that display the current active project -->
+                <active-widget></active-widget>
+            </div>
+        </div>
+    </nav>
+
+</div>

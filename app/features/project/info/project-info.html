@@ -1,0 +1,224 @@
+<!-- display the project overview -->
+<div class="container" ng-show="getActiveProject().id">
+
+    <div class="row">
+
+        <!-- SIDE BAR -->
+        <div class="col-sm-2 sidebar">
+            <ul class="nav nav-sidebar" ng-repeat="option in sidebarOptions">
+                <li ng-click="selectOption(option)"
+                    ng-class="getOptionClass(option)">
+                    <a ng-href="{{ option.url }}">{{ option.name }}</a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- PROJECT INFO -->
+        <div class="col-sm-10">
+            <dl class="dl-horizontal">
+                <dt>ID</dt>
+                <dd>{{activeProject.id}}</dd>
+
+                <dt>Project</dt>
+                <dd>{{activeProject.name}}</dd>
+
+                <dt>Author</dt>
+                <dd>{{activeProject.author}}</dd>
+
+                <dt>Description</dt>
+                <dd>{{activeProject.description}}</dd>
+            </dl>
+
+            <!-- Display view based on sidebar options -->
+            <div ng-switch on="selectedOption.name">
+
+                <div ng-switch-when="Graph">
+                    <!-- =============== PROJECT GRAPH OPTIONS =============== -->
+                    <div class="btn-group" role="group" aria-label="...">
+                        <!-- reset btn -->
+                        <button type="button"
+                                class="btn btn-default hvr-icon-sink-away"
+                                data-trigger="hover" data-placement="bottom"
+                                data-toggle="modal" data-target=".reset"
+                                title="Clear the graph. Be careful!">
+                            Reset &nbsp;
+                        </button>
+                        <!-- save btn -->
+                        <button type="button"
+                                class="btn btn-default hvr-icon-push"
+                                data-trigger="hover" data-placement="bottom"
+                                data-toggle="modal" data-target=".save"
+                                title="Save the current state of the graph for future used">
+                            Save &nbsp;
+                        </button>
+                        <!-- load btn -->
+                        <button type="button"
+                                class="btn btn-default hvr-icon-spin"
+                                data-trigger="hover" data-placement="bottom"
+                                data-toggle="modal" data-target=".load"
+                                title="Load the the graph previous saved state">
+                            Load &nbsp;
+                        </button>
+
+                        <!-- go back one state btn -->
+                        <button class="btn btn-default hvr-icon-back"
+                                data-trigger="hover" data-placement="bottom"
+                                data-toggle="modal" data-target=".undo"
+                                title="Load the the graph previous saved state">
+                            Undo State
+                        </button>
+
+                        <!-- go back one state btn -->
+                        <button class="btn btn-default hvr-icon-back"
+                                data-toggle="modal" data-target=".composition-view">
+                            Composition View
+                        </button>
+
+                        <button class="btn btn-default hvr-icon-back"
+                                data-toggle="modal" data-target=".edit-node">
+                            Edit node
+                        </button>
+
+
+                        <!-- run project btn-->
+                        <button data-trigger="hover" data-placement="bottom"
+                                class="btn" ng-class="getBtnClass()"
+                                title="Start the project"
+                                ng-click="toggleRunBtn(run,stop);">
+                            {{displayBtnText('Run Project')}}
+                            <i class="fa fa-cog fa-fw "
+                               ng-class="getIconClass()">
+                            </i>
+                        </button>
+
+                    </div>
+
+                    <!-- TODO: show the current "depth" of the web service-->
+                    <ol class="breadcrumb">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Library</a></li>
+                        <li class="active">Data</li>
+                    </ol>
+
+                    <hr/>
+
+                    <webservice-gui data="activeProject"></webservice-gui>
+                </div>
+
+
+                <!-- overview scatter plot data (demo) -->
+                <div ng-switch-when="Overview">
+
+                    <form class="form-inline">
+                        <div class="form-group">
+                            <label for="exampleInputName2">Enter Number</label>
+                            <input ng-model="plot.number" class="form-control"
+                                   id="exampleInputName2" placeholder="20">
+                            <ws-log>{{plot.number}}</ws-log>
+                        </div>
+                        <button type="submit" class="btn btn-default"
+                                ng-click="generateScatterPlotData()">Test
+                        </button>
+                    </form>
+
+                    <scatter-plot data="activeProject"></scatter-plot>
+                </div>
+
+                <!-- report bar chart # 1-->
+                <div ng-switch-when="Reports">
+                    <!-- run project btn-->
+                    <button data-trigger="hover" data-placement="bottom"
+                            class="btn" ng-class="getBtnClass()"
+                            title="Start the project"
+                            ng-click="toggleRunBtn(run,stop);">
+                        {{displayBtnText('Run Project')}}
+                        <i class="fa fa-cog fa-fw " ng-class="getIconClass()">
+                        </i>
+                    </button>
+                    <hr/>
+
+                    <ws-log>Reports: {{activeProject.dataReport.length}}
+                    </ws-log>
+                    <bar-chart data="activeProject"></bar-chart>
+                </div>
+
+
+                <div ng-switch-when="History">
+                    <form class="col-sm-6">
+                        <label for="web-service-string">Enter Text</label>
+                        <textarea ng-model="text" id="web-service-string"
+                                  class="form-control" rows="1"></textarea>
+                        <button ng-click="webservice(text)" type="button"
+                                class="btn btn-primary">Submit
+                        </button>
+                    </form>
+                    <horizontal-bar-chart
+                            data="activeProject"></horizontal-bar-chart>
+                </div>
+
+
+                <div ng-switch-when="Analytic">
+                    <p><code>Analytic</code></p>
+                    <line-chart></line-chart>
+                </div>
+
+
+                <div ng-switch-default>
+                    <code>{{selectedOption}}" Nothing here yet!. Select another
+                        options</code>
+                </div>
+
+            </div>
+
+            <!-- =============== CONFIRMATION MODAL =============== -->
+
+            <!-- ensure that button and confirm-box are matching! example below
+            The data-target should be preceded by a period: . (It is a class)
+
+            on the button element: : data-toggle="modal" data-target=".reset"
+            on the confirm-box element: target="reset"-->
+
+            <!-- reset -->
+            <confirm-box target="reset" title="Confirm Reset"
+                         update-fn="resetGraph()"
+                         content="All unsaved changes will be lost. Please confirm.">
+            </confirm-box>
+
+            <!-- save -->
+            <confirm-box target="save" title="Confirm Save"
+                         update-fn="saveGraph()"
+                         content="All changes to the graph will be saved. Please confirm.">
+            </confirm-box>
+
+            <!-- load -->
+            <confirm-box target="load" title="Confirm Load"
+                         update-fn="loadGraph()"
+                         content="All unsaved changes will be lost when you load a graph. Please confirm.">
+            </confirm-box>
+
+            <!-- undo state -->
+            <confirm-box target="undo" title="Confirm Reset"
+                         update-fn="undoState()"
+                         content="Go Back One State">
+            </confirm-box>
+
+            <confirm-box target="composition-view" title="Confirm Composition View"
+                         update-fn="composition()"
+                         content="Composition View">
+            </confirm-box>
+
+            <confirm-box target="hello world" title="Confirm Composition View"
+                         content="Hello world">
+            </confirm-box>
+        </div>
+
+    </div>
+</div>
+
+<!-- show error if there are no project selected -->
+<div class="container" ng-hide="getActiveProject().id">
+
+    <div class="alert alert-danger col-sm-6" role="alert">
+        <p>There is nothing to see here. Please select a project first!</p>
+    </div>
+</div>

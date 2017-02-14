@@ -1,0 +1,109 @@
+<!-- main container -->
+<div class="row">
+    <!-- author category list container -->
+    <div class="col-xs-3">
+        <!-- the default button -->
+        <a ng-click="selectAuthor()" class="btn btn-block btn-default btn-lg">
+            All
+        </a>
+        <!-- the buttons for each category (author) -->
+        <a ng-repeat="author in projects | orderBy:'author' | unique: 'author'"
+           ng-click="selectAuthor(author)"
+           class="btn btn-block btn-default btn-lg"
+           ng-class="getAuthorClass(author)">
+            {{author}} <span class="badge pull-right">{{ getAuthorCount(author) }}</span>
+        </a>
+    </div> <!-- end of author list container -->
+
+
+    <!-- project list container -->
+    <div class="col-xs-8">
+        <!-- container for all the projects and its information -->
+        <div ng-repeat="project in projects | filter:authorFilter |
+                          range:selectedPage:pageSize">
+
+            <!-- panel containers -->
+            <div class="panel panel-primary"
+                 ng-class="getPanelClass(project)">
+
+                <!-- panel title-->
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        {{project.name}}
+                        <span class="center-block pull-right lead">{{project.author}}</span>
+                    </h3>
+                </div>
+
+                <!-- panel body -->
+                <div class="panel-body">
+                    "{{project.description}}"
+                </div>
+
+                <!-- panel footer -->
+                <div class="panel-footer">
+                    <div class="btn-group" role="group" aria-label="...">
+                        <button type="button" class="btn btn-default"
+                                ng-click="selectPanel(project)">
+                            <i class="fa fa-hand-pointer-o" aria-hidden="true">
+                                &nbsp;Select
+                            </i>
+                        </button>
+                        <button type="button" class="btn btn-default"
+                                data-toggle="modal"
+                                ng-click="editProject(project)"
+                                data-target="#myModal">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true">
+                                &nbsp;Edit</i>
+                        </button>
+                    </div>
+                </div> <!-- End of panel footer -->
+
+            </div>
+        </div> <!-- end of project list container -->
+
+        <!-- =============== PAGINATION =============== -->
+        <div class="pull-right btn-group">
+            <a ng-repeat="project in projects |  filter:authorFilter | pageCount:pageSize"
+               ng-click="selectPage($index + 1)" class="btn btn-default"
+               ng-class="getPageClass($index + 1)">
+                {{$index + 1}}
+            </a>
+        </div>
+        <!-- =========================================== -->
+    </div>
+
+
+    <!-- Modal: quick edit on selected project -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        Quick Edit
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <!-- project form to edit -->
+                    <project-form project="projectToBeEdited"></project-form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary"
+                            data-dismiss="modal">Close
+                    </button>
+                    <!-- delete current project button -->
+                    <button type="button" data-dismiss="modal"
+                            ng-click="deleteProject(projectToBeEdited)"
+                            class="btn btn-danger">
+                        Delete
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </div> <!-- end of modal -->
+
+</div>

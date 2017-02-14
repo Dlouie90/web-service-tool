@@ -1,0 +1,6 @@
+# ignore node_modules directory
+/node_modules
+
+# ignore intellij idea settings
+/.idea
+/direct_stem_webservice.iml
