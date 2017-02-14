@@ -63,9 +63,9 @@
                         <!-- go back one state btn -->
                         <button class="btn btn-default hvr-icon-back"
                                 data-trigger="hover" data-placement="bottom"
-                                data-toggle="modal" data-target=".undo"
+                                data-toggle="modal" data-target=".goBackOneLevel"
                                 title="Load the the graph previous saved state">
-                            Undo State
+                            Go Back One Level
                         </button>
 
                         <!-- go back one state btn -->
@@ -196,9 +196,9 @@
                          content="All unsaved changes will be lost when you load a graph. Please confirm.">
             </confirm-box>
 
-            <!-- undo state -->
-            <confirm-box target="undo" title="Confirm Reset"
-                         update-fn="undoState()"
+            <!-- Go back one level/state -->
+            <confirm-box target="goBackOneLevel" title="Confirm Reset"
+                         update-fn="goBackOneLevel()"
                          content="Go Back One State">
             </confirm-box>
 

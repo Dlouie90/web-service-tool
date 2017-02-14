@@ -264,21 +264,19 @@ angular.module("WebserviceApp.Services")
                 activeProject.graph = {};
             },
 
-            undoStateFact: function () {
-                var history = activeProject.history.states;
+            goBackOneLevel: function () {
+                /* The active project history states stack. */
+                let historyStates = activeProject.history.states;
 
-                /* don't undo if the user only have one stack of history state
-                 * because it will delete all the views!*/
-                if (history.length <= 1) return;
+                /* Don't undo if the user only have history state on the
+                 * stack because it is the main graph view. */
+                if (historyStates.length <= 1) return;
 
-                /* remove the current state from history */
-                history.pop();
-                var svg = d3.select(".svg-main");
-                svg.selectAll("*").remove();
+                /* Remove the current state from history. */
+                historyStates.pop();
 
-                /* display the current view */
-                activeProject.graph = new Graph(svg, history[history.length - 1].nodes);
-                activeProject.graph.updateGraph();
+                /* Draw a graph of the state on top of the history stack */
+                updateGraph();
             },
 
 

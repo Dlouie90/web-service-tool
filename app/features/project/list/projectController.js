@@ -149,8 +149,8 @@ angular.module("WebserviceApp.Controllers")
             };
 
 
-            $scope.undoState = function() {
-                ProjectFactory.undoStateFact();
+            $scope.goBackOneLevel = function() {
+                ProjectFactory.goBackOneLevel();
             };
 
             $scope.composition = function() {
