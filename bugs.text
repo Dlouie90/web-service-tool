@@ -1,0 +1,14 @@
+This is a list of all the known bugs.
+
+
+1.
+    Problem:
+        Going into composition view of a Node and creating a new Node inside
+        the composition then backtracking one level and THEN returning back to
+        the same composition view. The newly created node is missing. It is
+        stored in the data structure because if you reload the graph, all the
+        nodes are there.
+
+    Temporarily solution:
+       Save the graph and load it again. The missing node will reappear.
+

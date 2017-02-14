@@ -1,37 +1,45 @@
 // a very simple project model
-function Project(id, author, name, description) {
-    this.id          = id;
-    this.author      = author;
-    this.name        = name;
-    this.description = description;
+/** A simple representation of web service Project. */
+class Project {
+    constructor(id, author, name, description) {
+        this.id          = id;
+        this.author      = author;
+        this.name        = name;
+        this.description = description;
 
-    /* --------------- DEFAULT VALUES --------------- */
+        /* --------------- DEFAULT VALUES --------------- */
 
-    this.graph = {};
-    this.nodes = undefined;
+        /** graph object represents the webservice visuals */
+        this.graph = {};
 
-    // array of webservice "run performance" values
-    this.dataReport = [];
+        /** The "main" node that all other node originate from. */
+        this.nodes = [];
 
-    // overview scatter plot demo data
-    this.scatterData = [];
+        /** array of webservice "run performance" values */
+        this.dataReport = [];
 
-    // Keep track of composition level (nodes of nodes)
-    this.history = {states: []};
+        /** Keep track of composition level (nodes of nodes) */
+        this.history = {
+            states: []    // a stack
+        };
 
-    /* Default chart demo data*/
-    this.chart = {
-        data: [
-            {letter: "A", count: 19},
-            {letter: "E", count: 5},
-            {letter: "I", count: 13},
-            {letter: "O", count: 17},
-            {letter: "U", count: 9},
-            {letter: "L", count: 3},
-            {letter: "B", count: 21},
-            {letter: "R", count: 0},
-            {letter: "N", count: 5}
-        ],
+        /** Overview scatter plot demo data */
+        this.scatterData = [];
+
+        /** Default chart demo data (unrelated to webservice) */
+        this.chart = {
+            data: [
+                {letter: "A", count: 19},
+                {letter: "E", count: 5},
+                {letter: "I", count: 13},
+                {letter: "O", count: 17},
+                {letter: "U", count: 9},
+                {letter: "L", count: 3},
+                {letter: "B", count: 21},
+                {letter: "R", count: 0},
+                {letter: "N", count: 5}
+            ],
+        }
     }
 }
 
@@ -209,7 +217,7 @@ angular.module("WebserviceApp.Services")
                 svg.selectAll("*").remove();
 
                 /* load project nodes otherwise load a default state */
-                if (activeProject.nodes) {
+                if (activeProject.nodes.length > 0) {
                     /* create a copy of project's nodes */
                     var nodes = [];
                     activeProject.nodes.forEach(function (n) {
