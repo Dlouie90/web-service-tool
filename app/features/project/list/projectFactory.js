@@ -54,7 +54,7 @@ class Project {
  * For example: adding and removing a project from our database or switching project
  */
 angular.module("WebserviceApp.Services")
-    .factory("ProjectFactory", function () {
+    .factory("ProjectFactory", () => {
         /** This value is used to assign Project's id. Use and increment this value
          * whenever you created a new Project (counter++) */
         let counterID = 1000;
@@ -86,6 +86,17 @@ angular.module("WebserviceApp.Services")
             return null;
         }
 
+        /** Replace the current display graph with a graph of the
+         * of state on top of the history state stack. */
+        function updateGraph() {
+            let historyStates = activeProject.history.states;
+            /* Replace the SVG. */
+            let svg = d3.select(".svg-main");
+            svg.selectAll("*").remove();
+            activeProject.graph = new Graph(
+                svg, historyStates[historyStates.length - 1].nodes);
+            activeProject.graph.updateGraph();
+        }
 
         function recursiveSave(_states) {
             /* get a copy of the states */
@@ -197,23 +208,15 @@ angular.module("WebserviceApp.Services")
                 }
             },
 
-            // clear out the main graph, start over. is an empty graph now
-            resetGraph: function () {
-                // clear the svg canvas
-                var svg = d3.select(".svg-main");
-                svg.selectAll("*").remove();
+            /** Clear out the Main graph and start over; empty the graph. */
+            resetGraph: () => {
+                /* Reset the history state stack with the default state,
+                 * the state of all new graph. */
+                let defaultState             = Graph.prototype.defaultState();
+                activeProject.history.states = [defaultState];
 
-                /* retrieve the default nodes */
-                var defaultState = Graph.prototype.defaultState();
-                var nodes        = defaultState.nodes;
-
-                /* init history list for the current project */
-                var history    = activeProject.history;
-                history.states = [defaultState];
-
-                /* display graph */
-                activeProject.graph = new Graph(svg, nodes);
-                activeProject.graph.updateGraph();
+                /* Draw a graph of the state on top of the history stack */
+                updateGraph();
             },
 
             // load whatever graph the current project contains
