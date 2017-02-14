@@ -1,6 +1,14 @@
 /* to do list
  * TODO: user cannot delete the initial two nodes
  * */
+
+
+class State {
+    constructor(nodes = [], parentNode = null) {
+        this.nodes       = nodes;
+        this.parentNode = parentNode;
+    }
+}
 /* =============== GLOBAL VARIABLES AND SETUP =============== */
 
 var idCounter = incrementer();
@@ -439,7 +447,7 @@ Graph.prototype.currentState = function () {
         nodes.push(copyObject(node));
     });
 
-    return {nodes: nodes};
+    return new State(nodes, undefined);
 };
 
 
@@ -462,10 +470,11 @@ Graph.prototype.defaultState = function () {
         compositionNodes: []
     };
 
-    var nodes = [node0, node1 ];
+    var nodes = [node0, node1];
 
     node0.neighbors.push(node1);
-    return {nodes: nodes, parentNode: null, test: true};
+
+    return new State(nodes);
 };
 
 
@@ -566,7 +575,8 @@ Graph.prototype.updateGraph = function () {
     newGs.append("text")
         .attr("text-anchor", "middle")
         .text(function (d) {
-            if(d.text) {}
+            if (d.text) {
+            }
             return `web-service: ${d.id}`;
         });
 

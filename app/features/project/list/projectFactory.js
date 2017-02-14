@@ -98,50 +98,6 @@ angular.module("WebserviceApp.Services")
             activeProject.graph.updateGraph();
         }
 
-        function recursiveSave(_states) {
-            /* get a copy of the states */
-            var states = [];
-            _states.forEach(function (state) {
-                states.push(JSON.parse(JSON.stringify(state)));
-            });
-
-            /* get the most recent parent node */
-            var parent = states[states.length - 1].parentNode;
-
-            for (var i = states.length - 1; i >= 0; i--) {
-
-                if (i == states.length - 1) {
-                    parent.compositionNodes = states[i].nodes;
-                } else {
-                    var findParent              = findNode(states[i].nodes, parent);
-                    findParent.compositionNodes = [];
-                    parent.compositionNodes.forEach(function (node) {
-                        findParent.compositionNodes.push(JSON.parse(JSON.stringify(node)));
-                    });
-
-                    parent = states[i].parentNode;
-
-                    if (parent == null) {
-                        var nodes = [];
-                        states[i].nodes.forEach(function (node) {
-                            nodes.push(JSON.parse(JSON.stringify(node)));
-                        });
-
-                        for (var k = 0; k < nodes.length; k++) {
-                            if (nodes[k].id == findParent.id) {
-                                nodes[k] = findParent;
-                            }
-                        }
-
-                        return {nodes: nodes, parentNode: null};
-                    } else {
-                        parent.compositionNodes = states[i].nodes;
-                    }
-                }
-            }
-            console.error("ERROR recursive save");
-        }
-
         /* =============== FACTORY FUNCTIONS =============== */
         return {
             addProject: project => {
@@ -181,38 +137,78 @@ angular.module("WebserviceApp.Services")
             /* =============== GRAPHS OPERATIONS =============== */
             /* TODO: clean up graph operations code, very messy */
 
-            // save whatever graph MAIN is displaying onto the current project
+            /** Save every changes made to the graph by the user. */
             saveGraph: function () {
-                var history = activeProject.history;
+                /* Replace the previous state on top of the stack with the
+                 * current one.*/
+                let history      = activeProject.history;
+                let parentNode   = history.states.pop().parentNode;
+                let currentState = activeProject.graph.currentState();
+                history.states.push(new State(currentState.nodes, parentNode));
 
-                /* retrieve the previous state parent node */
-                var previousState = history.states.length == 1 ? history.states[0] : history.states[history.states.length - 2];
-                var currentState  = history.states[history.states.length - 1];
-                var parentNode    = currentState.parentNode;
+                /* By reversing the stack array, the first element will be the
+                 * element on top of the stack. Easier to work with.*/
+                const STATES = history.states.map(state => {
+                    return JSON.parse(JSON.stringify(state));
+                }).reverse();
 
-                var savedState = activeProject.graph.currentState();
+                /* We trying to reduce the states into a single root state
+                 * that could be used to build the entire graph again. */
+                const ROOT_STATE = new State();
 
-                if (parentNode) {
-                    var newParentNode = findNode(previousState.nodes, parentNode);
+                /* These variables are used to help traverse  and pass values
+                 * through the stack.*/
+                let previousParentNode = null;
+                let currentParentNode  = null;
+                let nodes              = [];
 
-                    currentState.nodes      = activeProject.graph.currentState().nodes;
-                    currentState.parentNode = newParentNode;
+                /* Update the list of nodes to reflect any new composition nodes
+                 * that the user may have make. */
+                for (let i = 0; i < STATES.length; i++) {
 
-                    var result                                = recursiveSave(history.states);
-                    activeProject.nodes                       = result.nodes;
-                    history.states[history.states.length - 1] = currentState;
+                    previousParentNode = currentParentNode;
+                    currentParentNode  = STATES[i].parentNode;
+                    nodes              = STATES[i].nodes;
 
-                } else {
-                    history.states      = [savedState];
-                    activeProject.nodes = savedState.nodes;
+
+                    /* Parent node has composition nodes. Child node has parent.
+                     * Parent nodes may contain composition nodes. But its
+                     * "Child" version may not. We synchronize those two here. */
+                    if (previousParentNode) {
+                        for (let k = 0; k < nodes.length; k++) {
+                            if (nodes[k].id == previousParentNode.id) {
+                                nodes[k] = previousParentNode;
+                            }
+                        }
+                    }
+
+                    /* Save the current nodes onto the parent. Used to pass
+                     * composition nodes "up" the graph to be synchronize later. */
+                    if (currentParentNode) {
+                        Object.assign(currentParentNode,
+                            {compositionNodes: nodes});
+                    }
+
+                    /* Build "upward" to the the root. At the top, parentNode
+                     * will be null. Each node form "nodes" may contain composition
+                     * nodes.*/
+                    Object.assign(ROOT_STATE, {
+                        parentNode: currentParentNode,
+                        nodes     : nodes
+                    });
+
                 }
+                /* The active project nodes now contains a list of all the nodes
+                 * and all the nodes that each node is made up. */
+                activeProject.nodes = ROOT_STATE.nodes;
             },
 
             /** Clear out the Main graph and start over; empty the graph. */
             resetGraph: () => {
                 /* Reset the history state stack with the default state,
                  * the state of all new graph. */
-                let defaultState             = Graph.prototype.defaultState();
+                let defaultState = Graph.prototype.defaultState();
+                console.log("RESET() - default state", defaultState);
                 activeProject.history.states = [defaultState];
 
                 /* Draw a graph of the state on top of the history stack */
@@ -308,14 +304,18 @@ angular.module("WebserviceApp.Services")
                 /* This is state of the node that the users want to view
                  * the composition of. Whatever state that is on top of the
                  * history stack will be used to generate the display. */
-                historyStates.push({
-                    parentNode: JSON.parse(JSON.stringify(selectedNode)),
-                    nodes     : selectedNode.compositionNodes.slice()
-                });
+                let parentNode = JSON.parse(JSON.stringify(selectedNode));
+                let nodes      = findNode(currentState.nodes, selectedNode).compositionNodes
+                    || [];
+
+                historyStates.push(new State(nodes, parentNode));
+                console.log("COMPOSITION() - push to history stack", selectedNode);
+                console.log("COMPOSITION() - the stack", historyStates);
 
                 /* Draw a graph of the state on top of the history stack */
                 updateGraph();
             },
+
 
             /* ====== PERFORMANCES, RECORD, HISTORY DATA OPERATIONS  ======*/
 
@@ -343,4 +343,5 @@ angular.module("WebserviceApp.Services")
                 activeProject.chart.data = array;
             },
         }
-    });
+    })
+;
