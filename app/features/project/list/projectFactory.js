@@ -55,30 +55,35 @@ class Project {
  */
 angular.module("WebserviceApp.Services")
     .factory("ProjectFactory", function () {
-        var counter = 1000;
+        /** This value is used to assign Project's id. Use and increment this value
+         * whenever you created a new Project (counter++) */
+        let counterID = 1000;
 
-        var projects = [
-            new Project(counter++, "adam", "foobar", "my description #1"),
-            new Project(counter++, "james", "hello_world", "my description #2"),
-            new Project(counter++, "james", "python_is_cool", "my description #2"),
-            new Project(counter++, "luis", "fizz buzz", "my description #3"),
-            new Project(counter++, "luis", "A* search", "my description #3"),
-            new Project(counter++, "luis", "Dijkstra Search", "my description #3"),
-            new Project(counter++, "nelson", "depth first search", "my description #4"),
-            new Project(counter++, "nelson", "breadth first search", "my description #4"),
-            new Project(counter++, "shay", "IDE", "my description #5")
+        /** This stores all the projects created. */
+        const projects = [
+            new Project(counterID++, "adam", "foobar", "my description #1"),
+            new Project(counterID++, "james", "hello_world", "my description #2"),
+            new Project(counterID++, "james", "python_is_cool", "my description #2"),
+            new Project(counterID++, "luis", "fizz buzz", "my description #3"),
+            new Project(counterID++, "luis", "A* search", "my description #3"),
+            new Project(counterID++, "luis", "Dijkstra Search", "my description #3"),
+            new Project(counterID++, "nelson", "depth first search", "my description #4"),
+            new Project(counterID++, "nelson", "breadth first search", "my description #4"),
+            new Project(counterID++, "shay", "IDE", "my description #5"),
         ];
 
-        var activeProject = {};
+        /** This is the current project in view (selected and on displayed */
+        let activeProject = {};
 
-        function findNode(nodes, node) {
-            var result = null;
-            nodes.forEach(function (n) {
-                if (n.id == node.id) {
-                    result = n;
+        /** Given an id, and a list, return the node with that id.
+         * Otherwise return null. */
+        function findNode(nodes, {id}) {
+            for (let node of nodes) {
+                if (node.id == id) {
+                    return node;
                 }
-            });
-            return result;
+            }
+            return null;
         }
 
 
@@ -126,14 +131,15 @@ angular.module("WebserviceApp.Services")
             console.error("ERROR recursive save");
         }
 
+        /* =============== FACTORY FUNCTIONS =============== */
         return {
-            addProject: function (project) {
+            addProject: project => {
                 projects.push(project);
                 activeProject = {};
             },
 
-            removeProject: function (project) {
-                for (var i = 0; i < projects.length; i++) {
+            removeProject: project => {
+                for (let i = 0; i < projects.length; i++) {
                     if (projects[i].id === project.id) {
                         projects.splice(i, 1);
                         break;
@@ -141,20 +147,20 @@ angular.module("WebserviceApp.Services")
                 }
             },
 
-            getProjects: function () {
+            getProjects: () => {
                 return projects;
             },
 
-            generateID: function () {
-                return counter++;
+            generateID: () => {
+                return counterID++;
             },
 
-            getActiveProject: function () {
+            getActiveProject: () => {
                 return activeProject;
             },
 
-            setActiveProject: function (id) {
-                for (var i = 0; i < projects.length; i++) {
+            setActiveProject: id => {
+                for (let i = 0; i < projects.length; i++) {
                     if (projects[i].id == id) {
                         activeProject = projects[i];
                     }
@@ -251,7 +257,7 @@ angular.module("WebserviceApp.Services")
 
             /* Clear the graph object because it contains reference to SVG.
              * This allow other application to generate SVG*/
-            clearGraph: function () {
+            clearGraph: () => {
                 activeProject.graph = {};
             },
 
@@ -306,7 +312,6 @@ angular.module("WebserviceApp.Services")
                 activeProject.graph.updateGraph();
             },
 
-
             /* ====== PERFORMANCES, RECORD, HISTORY DATA OPERATIONS  ======*/
 
             /**
@@ -314,13 +319,13 @@ angular.module("WebserviceApp.Services")
              * generate fake performance data from 1-100 and push it into the
              * the activeProject dataReport array
              */
-            generateRandomData: function () {
-                var min        = 1, max = 100;
-                var randomData = Math.floor(Math.random() * (max - min + 1)) + min;
+            generateRandomData: () => {
+                let min        = 1, max = 100;
+                let randomData = Math.floor(Math.random() * (max - min + 1)) + min;
                 activeProject.dataReport.push(randomData);
             },
 
-            generateScatterPlotDataFactory: function () {
+            generateScatterPlotDataFactory: () => {
                 activeProject.scatterData.push({
                     x: Math.random() * 10,
                     y: Math.random() * 10,
@@ -329,7 +334,7 @@ angular.module("WebserviceApp.Services")
                 });
             },
 
-            setChartDataArrayFactory: function (array) {
+            setChartDataArrayFactory: array => {
                 activeProject.chart.data = array;
             },
         }
