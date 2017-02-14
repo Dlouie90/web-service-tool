@@ -18,7 +18,7 @@ class Project {
         /** array of webservice "run performance" values */
         this.dataReport = [];
 
-        /** Keep track of composition level (nodes of nodes) */
+        /** Keep track of viewComposition level (nodes of nodes) */
         this.history = {
             states: []    // a stack
         };
@@ -233,7 +233,7 @@ angular.module("WebserviceApp.Services")
                         nodes.push(JSON.parse(JSON.stringify(n)));
                     });
 
-                    /* create a copy of each nodes's composition nodes */
+                    /* create a copy of each nodes's viewComposition nodes */
                     nodes.forEach(function (node) {
                         var cn = [];
                         for (var i = 0; i < node.compositionNodes.length; i++) {
@@ -280,37 +280,41 @@ angular.module("WebserviceApp.Services")
             },
 
 
-            compositionFF: function () {
-                /* ensure that the user selected a node first */
-                if (!activeProject.graph.state.selectedNode) {
-                    return;
-                }
+            /** View the composition of the the currently selected node.
+             * (Display the nodes of nodes) */
+            viewComposition: () => {
+                /* Ensure that the user selected a node first.
+                 * TODO: Alert user when they don't have a node selected. */
+                if (!activeProject.graph.state.selectedNode)  return;
 
-                /* the currently highlighted node */
-                var selectedNode = activeProject.graph.state.selectedNode;
+                /* The node that the user clicks on.*/
+                let selectedNode  = activeProject.graph.state.selectedNode;
+                let historyStates = activeProject.history.states;
 
-                /* update the current state of history */
-                var history           = activeProject.history;
-                var currentParentNode = history.states[history.states.length - 1].parentNode;
-                history.states.pop();
-                var currentState        = activeProject.graph.currentState();
-                currentState.parentNode = currentParentNode;
-                history.states.push(currentState);
+                /* We use this later to backtrack and display the graph
+                 * state again. */
+                let currentParentNode =
+                        historyStates[historyStates.length - 1].parentNode;
 
-                /* add a state for the composition nodes (if any) */
-                var newState = {
+                /* Replace the state on top of the history stack with
+                 * the current one (which could be saved or unsaved) so the
+                 * user can navigate(backtrack) without having to save
+                 * the graph first. */
+                historyStates.pop();
+                let currentState = activeProject.graph.currentState();
+                Object.assign(currentState, {parentNode: currentParentNode});
+                historyStates.push(currentState);
+
+                /* This is state of the node that the users want to view
+                 * the composition of. Whatever state that is on top of the
+                 * history stack will be used to generate the display. */
+                historyStates.push({
                     parentNode: JSON.parse(JSON.stringify(selectedNode)),
                     nodes     : selectedNode.compositionNodes.slice()
-                };
-                history.states.push(newState);
+                });
 
-                /* clear the svg canvas */
-                var svg = d3.select(".svg-main");
-                svg.selectAll("*").remove();
-
-                /* display the composition nodes (if any) */
-                activeProject.graph = new Graph(svg, history.states[history.states.length - 1].nodes);
-                activeProject.graph.updateGraph();
+                /* Draw a graph of the state on top of the history stack */
+                updateGraph();
             },
 
             /* ====== PERFORMANCES, RECORD, HISTORY DATA OPERATIONS  ======*/

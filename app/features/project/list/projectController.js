@@ -153,8 +153,8 @@ angular.module("WebserviceApp.Controllers")
                 ProjectFactory.goBackOneLevel();
             };
 
-            $scope.composition = function() {
-                ProjectFactory.compositionFF();
+            $scope.viewComposition = function() {
+                ProjectFactory.viewComposition();
             };
 
             /* =============== BUTTONS FUNCTIONS =============== */
