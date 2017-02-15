@@ -98,6 +98,18 @@ angular.module("WebserviceApp.Services")
             activeProject.graph.updateGraph();
         }
 
+
+        /** Clear out the Main graph and start over; empty the graph. */
+        function _resetGraph() {
+            /* Reset the history state stack with the default state,
+             * the state of all new graph. */
+            let defaultState             = Graph.prototype.defaultState();
+            activeProject.history.states = [defaultState];
+
+            /* Draw a graph of the state on top of the history stack */
+            updateGraph();
+        }
+
         /* =============== FACTORY FUNCTIONS =============== */
         return {
             addProject: project => {
@@ -134,8 +146,10 @@ angular.module("WebserviceApp.Services")
                 }
             },
 
+
             /* =============== GRAPHS OPERATIONS =============== */
             /* TODO: clean up graph operations code, very messy */
+
 
             /** Save every changes made to the graph by the user. */
             saveGraph: function () {
@@ -209,17 +223,11 @@ angular.module("WebserviceApp.Services")
 
             /** Clear out the Main graph and start over; empty the graph. */
             resetGraph: () => {
-                /* Reset the history state stack with the default state,
-                 * the state of all new graph. */
-                let defaultState             = Graph.prototype.defaultState();
-                activeProject.history.states = [defaultState];
-
-                /* Draw a graph of the state on top of the history stack */
-                updateGraph();
+                _resetGraph();
             },
 
             // load whatever graph the current project contains
-            loadGraph: function () {
+            loadGraph: () => {
                 /* clear the svg canvas */
                 var svg = d3.select(".svg-main");
                 svg.selectAll("*").remove();
@@ -233,7 +241,7 @@ angular.module("WebserviceApp.Services")
                     });
 
                     /* create a copy of each nodes's viewComposition nodes */
-                    nodes.forEach(function (node) {
+                    nodes.forEach(node => {
                         var cn = [];
                         for (var i = 0; i < node.compositionNodes.length; i++) {
                             cn.push(JSON.parse(JSON.stringify(node.compositionNodes[i])));
@@ -251,7 +259,7 @@ angular.module("WebserviceApp.Services")
 
                 } else {
                     /* load a default graph */
-                    this.resetGraph();
+                    _resetGraph();
                 }
             },
 
