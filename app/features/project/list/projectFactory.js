@@ -170,7 +170,6 @@ angular.module("WebserviceApp.Services")
                     currentParentNode  = STATES[i].parentNode;
                     nodes              = STATES[i].nodes;
 
-
                     /* Parent node has composition nodes. Child node has parent.
                      * Parent nodes may contain composition nodes. But its
                      * "Child" version may not. We synchronize those two here. */
@@ -198,6 +197,11 @@ angular.module("WebserviceApp.Services")
                     });
 
                 }
+
+                /* Update the history stack, now the user can traverse to
+                 * composition vies, back, and to composition again. */
+                activeProject.history.states = STATES.reverse();
+
                 /* The active project nodes now contains a list of all the nodes
                  * and all the nodes that each node is made up. */
                 activeProject.nodes = ROOT_STATE.nodes;
@@ -207,8 +211,7 @@ angular.module("WebserviceApp.Services")
             resetGraph: () => {
                 /* Reset the history state stack with the default state,
                  * the state of all new graph. */
-                let defaultState = Graph.prototype.defaultState();
-                console.log("RESET() - default state", defaultState);
+                let defaultState             = Graph.prototype.defaultState();
                 activeProject.history.states = [defaultState];
 
                 /* Draw a graph of the state on top of the history stack */
@@ -246,11 +249,9 @@ angular.module("WebserviceApp.Services")
                     activeProject.graph = new Graph(svg, nodes);
                     activeProject.graph.updateGraph();
 
-                    console.log("loading a previous graph");
                 } else {
                     /* load a default graph */
                     this.resetGraph();
-                    console.log("no data, loading a default graph");
                 }
             },
 
@@ -309,8 +310,6 @@ angular.module("WebserviceApp.Services")
                     || [];
 
                 historyStates.push(new State(nodes, parentNode));
-                console.log("COMPOSITION() - push to history stack", selectedNode);
-                console.log("COMPOSITION() - the stack", historyStates);
 
                 /* Draw a graph of the state on top of the history stack */
                 updateGraph();
@@ -343,5 +342,4 @@ angular.module("WebserviceApp.Services")
                 activeProject.chart.data = array;
             },
         }
-    })
-;
+    });
