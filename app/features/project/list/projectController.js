@@ -36,23 +36,13 @@ angular.module("WebserviceApp.Controllers")
             $scope.compositionLevels = [];
 
 
-            /** Generate a list of parent's node id from the states track.
-             * If the state has not parent node (the root state), the its
-             * give "ROOT".*/
-            function updateCompositionLevels() {
-                const STATES       = ProjectFactory.getStates();
-                $scope.parentNodes = STATES.map(state => {
-                    return state.parentNode ? `ID# ${state.parentNode.id}` : "ROOT";
-                })
-            }
-
-
             /* =============== Author buttons functions =============== */
-            $scope.selectAuthor = function (author) {
+
+
+            $scope.selectAuthor   = function (author) {
                 selectedAuthor      = author;
                 $scope.selectedPage = 1;
             };
-
             $scope.getAuthorClass = function (author) {
                 return selectedAuthor == author ? constant.ACTIVE_BTN_CSS : "";
             };
@@ -71,13 +61,13 @@ angular.module("WebserviceApp.Controllers")
 
                 return count;
             };
+
             /* =============== Project Panel functions =============== */
             $scope.getPanelClass = function (project) {
                 return ProjectFactory.getActiveProject().id == project.id
                     ? constant.ACTIVE_PANEL_CSS : ""
             };
-
-            $scope.selectPanel = function (project) {
+            $scope.selectPanel   = function (project) {
                 ProjectFactory.setActiveProject(project.id);
                 $scope.selectedOption = undefined;
             };
@@ -91,23 +81,23 @@ angular.module("WebserviceApp.Controllers")
                 $scope.projects = ProjectFactory.getProjects();
             };
 
-
             /* =============== Pagination functions =============== */
-            $scope.selectPage = function (page) {
+
+
+            $scope.selectPage   = function (page) {
                 $scope.selectedPage = page;
             };
-
             $scope.getPageClass = function (page) {
                 return $scope.selectedPage == page ? constant.ACTIVE_BTN_CSS : ""
             };
 
-
             /* =============== SIDE BAR OPTIONS  FUNCTIONS =============== */
-            $scope.selectOption = function (option) {
+
+
+            $scope.selectOption   = function (option) {
                 $scope.selectedOption = option;
                 ProjectFactory.clearGraph();
             };
-
             $scope.getOptionClass = function (option) {
 
                 if ($scope.selectedOption)
@@ -116,8 +106,8 @@ angular.module("WebserviceApp.Controllers")
                     return "";
             };
 
-
             /* =============== PROJECT FUNCTIONS =============== */
+
 
             $scope.getActiveProject = function () {
                 $scope.activeProject = ProjectFactory.getActiveProject();
@@ -128,6 +118,7 @@ angular.module("WebserviceApp.Controllers")
 
             $scope.saveGraph = function () {
                 ProjectFactory.saveGraph();
+                updateCompositionLevels();
             };
 
             $scope.resetGraph = function () {
@@ -150,11 +141,11 @@ angular.module("WebserviceApp.Controllers")
             /* Count the frequency of letters in the user submitted text. Ignore all
              * other characters.  See CharFactory.js for the expected json object format
              * */
-            $scope.webservice = function (userText) {
+
+            $scope.webservice     = function (userText) {
                 console.log("CALLED");
                 var userData = {text: userText};
                 var url      = "/api/letters";
-
                 $http.post(url, userData).then(
                     function success(response) {
                         ProjectFactory.setChartDataArrayFactory(response.data.data)
@@ -162,16 +153,22 @@ angular.module("WebserviceApp.Controllers")
                     function error(response) {
                         console.log(response.status, response.statusText);
                     })
+
             };
-
-
             $scope.goBackOneLevel = function () {
                 ProjectFactory.goBackOneLevel();
                 updateCompositionLevels();
             };
 
+
             $scope.viewComposition = function () {
                 ProjectFactory.viewComposition();
+                updateCompositionLevels();
+            };
+
+
+            $scope.jumpToState = index => {
+                ProjectFactory.updateToState(index);
                 updateCompositionLevels();
             };
 
@@ -193,13 +190,27 @@ angular.module("WebserviceApp.Controllers")
 
             // display the "run" attribute text as the default text (when
             // the page is first loaded, else return the text field .
+
             $scope.displayBtnText = function () {
                 return runBtnText;
             };
 
             $scope.getBtnClass = function () {
                 return runBtnToggle ? constant.CANCEL_BTN_CSS : constant.DEFAULT_BTN_CSS;
+            };
+
+
+            /* =============== NON $SCOPE FUNCTIONS =============== */
+            /** Generate a list of parent's node id from the states track.
+             * If the state has not parent node (the root state), the its
+             * give "ROOT".*/
+            function updateCompositionLevels() {
+                const STATES       = ProjectFactory.getStates();
+                $scope.parentNodes = STATES.map(state => {
+                    return state.parentNode ? `ID# ${state.parentNode.id}` : "ROOT";
+                })
             }
 
         });
+
 

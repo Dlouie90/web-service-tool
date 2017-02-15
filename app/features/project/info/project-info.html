@@ -93,11 +93,10 @@
 
                     </div>
 
-                    <!-- TODO: show the current "depth" of the web service-->
                     <ol class="breadcrumb">
                         <li>Composition Level</li>
                         <li ng-repeat="item in parentNodes track by $index">
-                            <a>{{item}}</a>
+                            <a ng-click="jumpToState($index)">{{item}}</a>
                         </li>
                     </ol>
 

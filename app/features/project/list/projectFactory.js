@@ -88,13 +88,13 @@ angular.module("WebserviceApp.Services")
 
         /** Replace the current display graph with a graph of the
          * of state on top of the history state stack. */
-        function updateGraph() {
-            let historyStates = activeProject.history.states;
+        function drawCurrentState() {
+            let states = activeProject.history.states;
             /* Replace the SVG. */
             let svg = d3.select(".svg-main");
             svg.selectAll("*").remove();
             activeProject.graph = new Graph(
-                svg, historyStates[historyStates.length - 1].nodes);
+                svg, states[states.length - 1].nodes);
             activeProject.graph.updateGraph();
         }
 
@@ -108,7 +108,23 @@ angular.module("WebserviceApp.Services")
             activeProject.history.states = [defaultState];
 
             /* Draw a graph of the state on top of the history stack */
-            updateGraph();
+            drawCurrentState();
+        }
+
+
+        /** Update the top of the stack with the current state. */
+        function updateTopStack() {
+            /* Replace the state on top of the stack with the current one. */
+            let currentState = activeProject.graph.currentState();
+            let parentNode   = activeProject.history.states.pop().parentNode;
+            activeProject.history.states.push(
+                new State(currentState.nodes, parentNode));
+
+            /* TODO: move copy logic to the Graph.js */
+            activeProject.history.states = activeProject.history.states
+                .map(state => {
+                    return JSON.parse(JSON.stringify(state));
+                });
         }
 
         /* =============== FACTORY FUNCTIONS =============== */
@@ -151,16 +167,13 @@ angular.module("WebserviceApp.Services")
 
             /** Save every changes made to the graph by the user. */
             saveGraph: () => {
-                /* Replace the previous state on top of the stack with the
-                 * current one.*/
-                let history      = activeProject.history;
-                let parentNode   = history.states.pop().parentNode;
-                let currentState = activeProject.graph.currentState();
-                history.states.push(new State(currentState.nodes, parentNode));
+                /* Update the stop state stack with the user's most recent
+                 * changes.*/
+                updateTopStack();
 
                 /* By reversing the stack array, the first element will be the
                  * element on top of the stack. Easier to work with.*/
-                const STATES = history.states.map(state => {
+                const STATES = activeProject.history.states.map(state => {
                     return JSON.parse(JSON.stringify(state));
                 }).reverse();
 
@@ -248,7 +261,7 @@ angular.module("WebserviceApp.Services")
                     history.states = [new State(nodes)];
 
                     /* Draw a graph of the state on top of the history stack */
-                    updateGraph();
+                    drawCurrentState();
 
                 } else {
                     /* load a default graph */
@@ -274,7 +287,7 @@ angular.module("WebserviceApp.Services")
                 historyStates.pop();
 
                 /* Draw a graph of the state on top of the history stack */
-                updateGraph();
+                drawCurrentState();
             },
 
 
@@ -312,8 +325,7 @@ angular.module("WebserviceApp.Services")
 
                 historyStates.push(new State(nodes, parentNode));
 
-                /* Draw a graph of the state on top of the history stack */
-                updateGraph();
+                drawCurrentState();
             },
 
 
@@ -322,6 +334,18 @@ angular.module("WebserviceApp.Services")
                 return activeProject.history.states;
             },
 
+            /** Given an index of the history.states ("stack"), update the graph
+             * to display that state. All state "on top" on the target state will
+             * be pop. */
+            updateToState(index) {
+                /* Save the user's current state onto the stack. */
+                updateTopStack();
+
+                activeProject.history.states =
+                    activeProject.history.states.slice(0, index + 1);
+
+                drawCurrentState();
+            },
 
             /* ====== PERFORMANCES, RECORD, HISTORY DATA OPERATIONS  ======*/
 
@@ -348,5 +372,7 @@ angular.module("WebserviceApp.Services")
             setChartDataArrayFactory: array => {
                 activeProject.chart.data = array;
             },
+
+
         }
     });
