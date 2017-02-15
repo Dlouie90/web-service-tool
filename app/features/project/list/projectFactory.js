@@ -104,6 +104,7 @@ angular.module("WebserviceApp.Services")
             /* Reset the history state stack with the default state,
              * the state of all new graph. */
             let defaultState             = Graph.prototype.defaultState();
+            activeProject.nodes          = defaultState.nodes;
             activeProject.history.states = [defaultState];
 
             /* Draw a graph of the state on top of the history stack */
@@ -306,13 +307,19 @@ angular.module("WebserviceApp.Services")
                  * the composition of. Whatever state that is on top of the
                  * history stack will be used to generate the display. */
                 let parentNode = JSON.parse(JSON.stringify(selectedNode));
-                let nodes      = findNode(currentState.nodes, selectedNode).compositionNodes
-                    || [];
+                let nodes      = findNode(currentState.nodes, selectedNode)
+                        .compositionNodes || [];
 
                 historyStates.push(new State(nodes, parentNode));
 
                 /* Draw a graph of the state on top of the history stack */
                 updateGraph();
+            },
+
+
+            /* =============== GRAPH UTILITY OPERATIONS ===============*/
+            getStates: () => {
+                return activeProject.history.states;
             },
 
 

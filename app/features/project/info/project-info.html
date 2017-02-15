@@ -95,9 +95,10 @@
 
                     <!-- TODO: show the current "depth" of the web service-->
                     <ol class="breadcrumb">
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">Library</a></li>
-                        <li class="active">Data</li>
+                        <li>Composition Level</li>
+                        <li ng-repeat="item in parentNodes track by $index">
+                            <a href="#">{{item}}</a>
+                        </li>
                     </ol>
 
                     <hr/>

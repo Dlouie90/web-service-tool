@@ -33,6 +33,20 @@ angular.module("WebserviceApp.Controllers")
             $scope.selectedOption = undefined;
 
 
+            $scope.compositionLevels = [];
+
+
+            /** Generate a list of parent's node id from the states track.
+             * If the state has not parent node (the root state), the its
+             * give "ROOT".*/
+            function updateCompositionLevels() {
+                const STATES       = ProjectFactory.getStates();
+                $scope.parentNodes = STATES.map(state => {
+                    return state.parentNode ? `ID# ${state.parentNode.id}` : "ROOT";
+                })
+            }
+
+
             /* =============== Author buttons functions =============== */
             $scope.selectAuthor = function (author) {
                 selectedAuthor      = author;
@@ -118,10 +132,12 @@ angular.module("WebserviceApp.Controllers")
 
             $scope.resetGraph = function () {
                 ProjectFactory.resetGraph();
+                updateCompositionLevels();
             };
 
             $scope.loadGraph = function () {
                 ProjectFactory.loadGraph();
+                updateCompositionLevels();
             };
 
             $scope.generateScatterPlotData = function () {
@@ -149,12 +165,14 @@ angular.module("WebserviceApp.Controllers")
             };
 
 
-            $scope.goBackOneLevel = function() {
+            $scope.goBackOneLevel = function () {
                 ProjectFactory.goBackOneLevel();
+                updateCompositionLevels();
             };
 
-            $scope.viewComposition = function() {
+            $scope.viewComposition = function () {
                 ProjectFactory.viewComposition();
+                updateCompositionLevels();
             };
 
             /* =============== BUTTONS FUNCTIONS =============== */
