@@ -146,13 +146,10 @@ angular.module("WebserviceApp.Services")
                 }
             },
 
-
             /* =============== GRAPHS OPERATIONS =============== */
-            /* TODO: clean up graph operations code, very messy */
-
 
             /** Save every changes made to the graph by the user. */
-            saveGraph: function () {
+            saveGraph: () => {
                 /* Replace the previous state on top of the stack with the
                  * current one.*/
                 let history      = activeProject.history;
@@ -228,34 +225,29 @@ angular.module("WebserviceApp.Services")
 
             // load whatever graph the current project contains
             loadGraph: () => {
-                /* clear the svg canvas */
-                var svg = d3.select(".svg-main");
-                svg.selectAll("*").remove();
 
                 /* load project nodes otherwise load a default state */
                 if (activeProject.nodes.length > 0) {
-                    /* create a copy of project's nodes */
-                    var nodes = [];
-                    activeProject.nodes.forEach(function (n) {
-                        nodes.push(JSON.parse(JSON.stringify(n)));
+                    /* Clone  so the Nodes Object will work with d3.js.
+                     * D3 looks at  the object memory location but we want them
+                     * to just treat  every object with the same id as the same. */
+                    let nodes = activeProject.nodes.map(n => {
+                        return JSON.parse(JSON.stringify(n));
                     });
-
-                    /* create a copy of each nodes's viewComposition nodes */
                     nodes.forEach(node => {
-                        var cn = [];
-                        for (var i = 0; i < node.compositionNodes.length; i++) {
+                        let cn = [];
+                        for (let i = 0; i < node.compositionNodes.length; i++) {
                             cn.push(JSON.parse(JSON.stringify(node.compositionNodes[i])));
                         }
                         node.compositionNodes = cn;
                     });
 
-                    /*  init history list for the current view */
-                    var history    = activeProject.history;
-                    history.states = [{nodes: nodes}];
+                    /* init history list for the current view */
+                    let history    = activeProject.history;
+                    history.states = [new State(nodes)];
 
-                    /* display the graph */
-                    activeProject.graph = new Graph(svg, nodes);
-                    activeProject.graph.updateGraph();
+                    /* Draw a graph of the state on top of the history stack */
+                    updateGraph();
 
                 } else {
                     /* load a default graph */
@@ -269,7 +261,7 @@ angular.module("WebserviceApp.Services")
                 activeProject.graph = {};
             },
 
-            goBackOneLevel: function () {
+            goBackOneLevel: () => {
                 /* The active project history states stack. */
                 let historyStates = activeProject.history.states;
 
