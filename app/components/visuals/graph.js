@@ -5,7 +5,7 @@
 
 class State {
     constructor(nodes = [], parentNode = null) {
-        this.nodes       = nodes;
+        this.nodes      = nodes;
         this.parentNode = parentNode;
     }
 }
@@ -103,8 +103,8 @@ function Graph(svgIn, nodesIn) {
         .attr('id', 'end-arrow')
         .attr('viewBox', '0 -5 10 10')
         .attr('refX', "32")
-        .attr('markerWidth', 3.5)
-        .attr('markerHeight', 3.5)
+        .attr('markerWidth', 4.0)
+        .attr('markerHeight', 4.5)
         .attr('orient', 'auto')
         .append('svg:path')
         .attr('d', 'M0,-5L10,0L0,5');
@@ -166,7 +166,7 @@ function Graph(svgIn, nodesIn) {
 /* =============== PROTOTYPE  CONSTANTS =============== */
 Graph.prototype.final = {
     /* --------------- NODE CONSTANTS --------------- */
-    NODE_RADIUS: 50,
+    NODE_RADIUS: 60,
 
     /* --------------- KEY CODES --------------- */
     BACK_SPACE_KEY: 8, DELETE_KEY: 46,
@@ -574,11 +574,19 @@ Graph.prototype.updateGraph = function () {
 
     newGs.append("text")
         .attr("text-anchor", "middle")
+        .style("font", "14px 'Helvetica Neue'")
         .text(function (d) {
-            if (d.text) {
-            }
-            return `web-service: ${d.id}`;
+            return `name: ${d.id}`;
         });
+
+    /* Attach an html element onto the circle that display the number
+     * of composition nodes (children) that the current node contains. */
+    newGs.append("foreignObject")
+        .append("xhtml:body")
+        .html(function (d) {
+            return `<p style="float:none">${d.compositionNodes.length}</p>`;
+        });
+
 
     // remove old nodes;
     thisGraph.circles.exit().remove();
