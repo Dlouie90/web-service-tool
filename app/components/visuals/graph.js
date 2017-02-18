@@ -34,66 +34,53 @@ function incrementer() {
     }
 }
 
-function convertState(nodeArray) {
-    var _nodes  = [], _edges = [];
-    var nodeSet = getNodeSet(nodeArray);
+/** Given a list nodes, return an object with the nodes and its edges.
+ * Each node will be "clone". */
+function parseData(nodeArray) {
 
-    for (var i = 0; i < nodeArray.length; i++) {
-        _nodes.push(getNode(nodeSet, nodeArray[i]));
-    }
+    /*  TLDR: Need to clone for d3.js to work properly.
+     *  Javascript and d3.js equate object based on their memory location(?).
+     *  But because we identify and organize our node based on ID, some node
+     *  may not be == the same to d3.js even though they have the same id.
+     *  (This is because we save, load, and reload our nodes).
+     *  The solution to this is to clone all the nodes here before we work on
+     *  them. If we don't clone, when we move some node, d3.js won't see the
+     *  the change in x y pos because he is still looking at the memory location. */
+    const nodes = nodeArray.map(node => JSON.parse(JSON.stringify(node)));
+    const edges = [];
 
-    for (i = 0; i < _nodes.length; i++) {
-        var current   = _nodes[i];
-        var neighbors = current.neighbors;
-
-        for (var k = 0; k < neighbors.length; k++) {
-            _edges.push({
-                source: getNode(nodeSet, current),
-                target: getNode(nodeSet, neighbors[k])
+    for (let node of nodes) {
+        for (let neighbor of node.neighbors) {
+            edges.push({
+                source: node,
+                /* Same reasoning as above. We want to ensure the neighbor node
+                 * is the same node in memory as the node in the nodes array. */
+                target: findNeighbor(nodes, neighbor)
             })
         }
     }
-
-    return {nodes: _nodes, edges: _edges};
+    return {nodes: nodes, edges: edges};
 }
 
-function getNode(set, node) {
-    for (var i = 0; i < set.length; i++) {
-        if (set[i].id == node.id) {
-            return set[i];
-        }
+/** Return the node with the same id as the neighbors in the nodes array. */
+function findNeighbor(nodes, neighbor) {
+    for (let node of nodes) {
+        if (node.id === neighbor.id)
+            return node;
     }
-    console.error("getNode function error");
-}
-function getNodeSet(nodeArray) {
-    var nodeSet = [];
-
-    for (var i = 0; i < nodeArray.length; i++) {
-        if (!contain(nodeSet, nodeArray[i])) {
-            nodeSet.push(nodeArray[i]);
-        }
-    }
-    return nodeSet;
+    console.error("findNeighbor function error");
 }
 
-function contain(array, item) {
-    for (var i = 0; i < array.length; i++) {
-        if (array[i].id == item.id) {
-            return true;
-        }
-    }
-    return false;
-}
 function Graph(svgIn, nodesIn, parentNode = undefined) {
     // for clarity: typing this over and over can be confusing
     var thisGraph = this;
 
-    var cs = convertState(nodesIn);
+    const nodeEdgeData = parseData(nodesIn);
 
     /* *** Graph variables *** */
     thisGraph.svg        = svgIn;
-    thisGraph.nodes      = cs.nodes || [];
-    thisGraph.edges      = cs.edges || [];
+    thisGraph.nodes      = nodeEdgeData.nodes || [];
+    thisGraph.edges      = nodeEdgeData.edges || [];
     thisGraph.paths      = undefined;
     thisGraph.circles    = undefined;
     thisGraph.svgG       = undefined;
@@ -455,7 +442,7 @@ Graph.prototype.svgMouseUp = function () {
  * Return a copy of the state of the graph. Can be used to repopulate the
  * the state of the graph.
  */
-Graph.prototype.currentState =  function() {
+Graph.prototype.currentState = function () {
     const nodes = this.nodes.map(node => {
         return copyObject(node);
     });

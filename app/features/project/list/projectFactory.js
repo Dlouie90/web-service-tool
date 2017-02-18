@@ -61,15 +61,8 @@ angular.module("WebserviceApp.Services")
 
         /** This stores all the projects created. */
         const projects = [
-            new Project(counterID++, "adam", "foobar", "my description #1"),
-            new Project(counterID++, "james", "hello_world", "my description #2"),
-            new Project(counterID++, "james", "python_is_cool", "my description #2"),
-            new Project(counterID++, "luis", "fizz buzz", "my description #3"),
-            new Project(counterID++, "luis", "A* search", "my description #3"),
-            new Project(counterID++, "luis", "Dijkstra Search", "my description #3"),
-            new Project(counterID++, "nelson", "depth first search", "my description #4"),
-            new Project(counterID++, "nelson", "breadth first search", "my description #4"),
-            new Project(counterID++, "shay", "IDE", "my description #5"),
+            new Project(counterID++, "Trump", "Super Wall", "This wall will be bigly."),
+
         ];
 
         /** This is the current project in view (selected and on displayed */
@@ -157,9 +150,7 @@ angular.module("WebserviceApp.Services")
 
                 /* By reversing the stack array, the first element will be the
                  * element on top of the stack. Easier to work with.*/
-                const STATES = activeProject.history.states.map(state => {
-                    return JSON.parse(JSON.stringify(state));
-                }).reverse();
+                const STATES = activeProject.history.states.reverse();
 
                 /* We trying to reduce the states into a single root state
                  * that could be used to build the entire graph again. */
@@ -223,26 +214,12 @@ angular.module("WebserviceApp.Services")
 
             // load whatever graph the current project contains
             loadGraph: () => {
-
                 /* load project nodes otherwise load a default state */
                 if (activeProject.nodes.length > 0) {
-                    /* Clone so the Nodes Object will work with d3.js.
-                     * D3 looks at  the object memory location but we want them
-                     * to just treat  every object with the same id as the same. */
-                    let nodes = activeProject.nodes.map(n => {
-                        return JSON.parse(JSON.stringify(n));
-                    });
-                    nodes.forEach(node => {
-                        let cn = [];
-                        for (let i = 0; i < node.compositionNodes.length; i++) {
-                            cn.push(JSON.parse(JSON.stringify(node.compositionNodes[i])));
-                        }
-                        node.compositionNodes = cn;
-                    });
 
                     /* init history list for the current view */
                     let history    = activeProject.history;
-                    history.states = [new State(nodes)];
+                    history.states = [new State(activeProject.nodes)];
 
                     /* Draw a graph of the state on top of the history stack */
                     drawCurrentState();
@@ -291,7 +268,7 @@ angular.module("WebserviceApp.Services")
 
                 /* This is state of the node that the users want to view
                  * the composition of. */
-                let parentNode = JSON.parse(JSON.stringify(selectedNode));
+                let parentNode = selectedNode;
                 let nodes      = selectedNode.compositionNodes || [];
 
                 /* Whatever state that is on top of the  history stack will
