@@ -75,26 +75,18 @@ angular.module("WebserviceApp.Services")
         /** This is the current project in view (selected and on displayed */
         let activeProject = {};
 
-        /** Given an id, and a list, return the node with that id.
-         * Otherwise return null. */
-        function findNode(nodes, {id}) {
-            for (let node of nodes) {
-                if (node.id == id) {
-                    return node;
-                }
-            }
-            return null;
-        }
 
         /** Replace the current display graph with a graph of the
          * of state on top of the history state stack. */
         function drawCurrentState() {
-            let states = activeProject.history.states;
+            let states      = activeProject.history.states;
+            let recentState = states[states.length - 1];
+
             /* Replace the SVG. */
             let svg = d3.select(".svg-main");
             svg.selectAll("*").remove();
             activeProject.graph = new Graph(
-                svg, states[states.length - 1].nodes);
+                svg, recentState.nodes, recentState.parentNode);
             activeProject.graph.updateGraph();
         }
 
@@ -111,20 +103,13 @@ angular.module("WebserviceApp.Services")
             drawCurrentState();
         }
 
-
-        /** Update the top of the stack with the current state. */
-        function updateTopStack() {
-            /* Replace the state on top of the stack with the current one. */
+        /** Update the current state on the history states stack (top one).
+         *  Why? When the user make changes, the changes are not recorded
+         *  at the state level. */
+        function updateCurrentState() {
             let currentState = activeProject.graph.currentState();
-            let parentNode   = activeProject.history.states.pop().parentNode;
-            activeProject.history.states.push(
-                new State(currentState.nodes, parentNode));
-
-            /* TODO: move copy logic to the Graph.js */
-            activeProject.history.states = activeProject.history.states
-                .map(state => {
-                    return JSON.parse(JSON.stringify(state));
-                });
+            activeProject.history.states.pop();
+            activeProject.history.states.push(currentState);
         }
 
         /* =============== FACTORY FUNCTIONS =============== */
@@ -167,9 +152,8 @@ angular.module("WebserviceApp.Services")
 
             /** Save every changes made to the graph by the user. */
             saveGraph: () => {
-                /* Update the stop state stack with the user's most recent
-                 * changes.*/
-                updateTopStack();
+                /* Update the state stack with the user's most recent changes.*/
+                updateCurrentState();
 
                 /* By reversing the stack array, the first element will be the
                  * element on top of the stack. Easier to work with.*/
@@ -242,7 +226,7 @@ angular.module("WebserviceApp.Services")
 
                 /* load project nodes otherwise load a default state */
                 if (activeProject.nodes.length > 0) {
-                    /* Clone  so the Nodes Object will work with d3.js.
+                    /* Clone so the Nodes Object will work with d3.js.
                      * D3 looks at  the object memory location but we want them
                      * to just treat  every object with the same id as the same. */
                     let nodes = activeProject.nodes.map(n => {
@@ -299,30 +283,21 @@ angular.module("WebserviceApp.Services")
                 if (!activeProject.graph.state.selectedNode)  return;
 
                 /* The node that the user clicks on.*/
-                let selectedNode  = activeProject.graph.state.selectedNode;
-                let historyStates = activeProject.history.states;
+                let selectedNode = activeProject.graph.state.selectedNode;
 
-                /* We use this later to backtrack and display the graph
-                 * state again. */
-                let currentParentNode =
-                        historyStates[historyStates.length - 1].parentNode;
-
-                /* Replace the state on top of the history stack with
-                 * the current one (which could be saved or unsaved) so the
-                 * user can navigate(backtrack) without having to save
-                 * the graph first. */
-                historyStates.pop();
-                let currentState = activeProject.graph.currentState();
-                Object.assign(currentState, {parentNode: currentParentNode});
-                historyStates.push(currentState);
+                /* Update the current state before so the changes the user made
+                 * will be saved at the state level. */
+                updateCurrentState();
 
                 /* This is state of the node that the users want to view
-                 * the composition of. Whatever state that is on top of the
-                 * history stack will be used to generate the display. */
+                 * the composition of. */
                 let parentNode = JSON.parse(JSON.stringify(selectedNode));
-                let nodes      = findNode(currentState.nodes, selectedNode)
-                        .compositionNodes || [];
+                let nodes      = selectedNode.compositionNodes || [];
 
+                /* Whatever state that is on top of the  history stack will
+                 * be used to generate the display. The composition view is
+                 * on top of the stack. */
+                let historyStates = activeProject.history.states;
                 historyStates.push(new State(nodes, parentNode));
 
                 drawCurrentState();
@@ -338,8 +313,8 @@ angular.module("WebserviceApp.Services")
              * to display that state. All state "on top" on the target state will
              * be pop. */
             updateToState(index) {
-                /* Save the user's current state onto the stack. */
-                updateTopStack();
+                /* Save the user's most recent state onto the stack. */
+                updateCurrentState();
 
                 activeProject.history.states =
                     activeProject.history.states.slice(0, index + 1);
@@ -372,7 +347,5 @@ angular.module("WebserviceApp.Services")
             setChartDataArrayFactory: array => {
                 activeProject.chart.data = array;
             },
-
-
         }
     });

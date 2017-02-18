@@ -9,6 +9,20 @@ class State {
         this.parentNode = parentNode;
     }
 }
+
+class Node {
+    constructor(id, x, y, neighbors = [], compositionNodes = []) {
+        /* todo: change neighbors name to siblings
+         * todo: change compositionNodes to children. */
+        this.id               = id;
+        this.x                = x;
+        this.y                = y;
+        this.neighbors        = neighbors;
+        this.compositionNodes = compositionNodes;
+    }
+
+    /*TODO: write a static method that clones the node*/
+}
 /* =============== GLOBAL VARIABLES AND SETUP =============== */
 
 var idCounter = incrementer();
@@ -70,22 +84,23 @@ function contain(array, item) {
     }
     return false;
 }
-function Graph(svgIn, nodesIn) {
+function Graph(svgIn, nodesIn, parentNode = undefined) {
     // for clarity: typing this over and over can be confusing
     var thisGraph = this;
 
     var cs = convertState(nodesIn);
 
     /* *** Graph variables *** */
-    thisGraph.svg      = svgIn;
-    thisGraph.nodes    = cs.nodes || [];
-    thisGraph.edges    = cs.edges || [];
-    thisGraph.paths    = undefined;
-    thisGraph.circles  = undefined;
-    thisGraph.svgG     = undefined;
-    thisGraph.dragLine = undefined;
-    thisGraph.drag     = undefined;
-    thisGraph.stack    = [];
+    thisGraph.svg        = svgIn;
+    thisGraph.nodes      = cs.nodes || [];
+    thisGraph.edges      = cs.edges || [];
+    thisGraph.paths      = undefined;
+    thisGraph.circles    = undefined;
+    thisGraph.svgG       = undefined;
+    thisGraph.dragLine   = undefined;
+    thisGraph.drag       = undefined;
+    thisGraph.stack      = [];
+    thisGraph.parentNode = parentNode;
 
     // State of the graph (selected nodes, links, etc..)
     thisGraph.state = {
@@ -440,51 +455,32 @@ Graph.prototype.svgMouseUp = function () {
  * Return a copy of the state of the graph. Can be used to repopulate the
  * the state of the graph.
  */
-Graph.prototype.currentState = function () {
-    var nodes = [];
-
-    this.nodes.forEach(function (node) {
-        nodes.push(copyObject(node));
+Graph.prototype.currentState =  function() {
+    const nodes = this.nodes.map(node => {
+        return copyObject(node);
     });
 
-    return new State(nodes, undefined);
+    return new State(nodes, this.parentNode);
 };
 
 
-/**
- * Return a "start-up" graph. Default graph.
- */
+/**  Return a "start-up" graph. Default graph. */
 Graph.prototype.defaultState = function () {
-    var node0 = {
-        id              : idCounter(),
-        x               : 575 - 200,
-        y               : 100,
-        neighbors       : [],
-        compositionNodes: []
-    };
-    var node1 = {
-        id              : idCounter(),
-        x               : 575,
-        y               : 100,
-        neighbors       : [],
-        compositionNodes: []
-    };
-
-    var nodes = [node0, node1];
-
+    /* Create two default nodes with an edge. */
+    const node0 = new Node(idCounter(), 575 - 200, 100);  // default neighbors,
+    const node1 = new Node(idCounter(), 575, 100);        // composition = []
     node0.neighbors.push(node1);
 
-    return new State(nodes);
+    /* Default state with no parentNode. */
+    return new State([node0, node1]);
 };
 
 
-/**
- * @return Node
- *   Copy an object using JSON parse and stringify
- */
+/** Copy and return the copy. */
 function copyObject(object) {
     return JSON.parse(JSON.stringify(object));
 }
+
 
 /* =============== MAIN FUNCTION  =============== */
 
