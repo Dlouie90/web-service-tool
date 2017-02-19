@@ -1,16 +1,17 @@
 <!-- display the project overview -->
-<div class="container" ng-show="getActiveProject().id">
+<div class="container " ng-show="getActiveProject().id">
 
     <div class="row">
 
         <!-- SIDE BAR -->
-        <div class="col-sm-2 sidebar">
-            <ul class="nav nav-sidebar" ng-repeat="option in sidebarOptions">
-                <li ng-click="selectOption(option)"
-                    ng-class="getOptionClass(option)">
-                    <a ng-href="{{ option.url }}">{{ option.name }}</a>
-                </li>
-            </ul>
+        <div class="col-sm-2">
+
+
+            <button class="btn btn-block btn-default"
+                    ng-repeat="option in topics"
+                    ng-click="displayTopic(option.topic)">
+                {{option.topic}}
+            </button>
         </div>
 
         <!-- PROJECT INFO -->
@@ -30,7 +31,7 @@
             </dl>
 
             <!-- Display view based on sidebar options -->
-            <div ng-switch on="selectedOption.name">
+            <div ng-switch on="selectedTopic">
 
                 <div ng-switch-when="Graph">
                     <!-- =============== PROJECT GRAPH OPTIONS =============== -->
@@ -56,7 +57,7 @@
                                 class="btn btn-default hvr-icon-spin"
                                 data-trigger="hover" data-placement="bottom"
                                 data-toggle="modal" data-target=".load"
-                                title="Load the the graph previous saved state">
+                                title="Load and previously saved graph">
                             Load &nbsp;
                         </button>
 
@@ -64,7 +65,7 @@
                         <button class="btn btn-default hvr-icon-back"
                                 data-trigger="hover" data-placement="bottom"
                                 data-toggle="modal" data-target=".goBackOneLevel"
-                                title="Load the the graph previous saved state">
+                                title="Return to the previous level">
                             Go Back One Level
                         </button>
 
@@ -107,6 +108,11 @@
 
 
                 <!-- overview scatter plot data (demo) -->
+                <div ng-switch-when="Summary">
+                    Summary!!!
+                    <circle-pack data="circlePack.data"></circle-pack>
+                </div>
+
                 <div ng-switch-when="Overview">
 
                     <form class="form-inline">

@@ -11,14 +11,14 @@ class State {
 }
 
 class Node {
-    constructor(id, x, y, neighbors = [], compositionNodes = []) {
+    constructor(id, x, y, neighbors = [], children = []) {
         /* todo: change neighbors name to siblings
          * todo: change compositionNodes to children. */
-        this.id               = id;
-        this.x                = x;
-        this.y                = y;
-        this.neighbors        = neighbors;
-        this.compositionNodes = compositionNodes;
+        this.id        = id;
+        this.x         = x;
+        this.y         = y;
+        this.neighbors = neighbors;
+        this.children  = children;
     }
 
     /*TODO: write a static method that clones the node*/
@@ -419,11 +419,11 @@ Graph.prototype.svgMouseUp = function () {
     if (state.graphMouseDown && d3.event.shiftKey) {
         var xyCord = d3.mouse(thisGraph.svgG.node());
         var node   = {
-            id              : idCounter(),
-            x               : xyCord[0],
-            y               : xyCord[1],
-            neighbors       : [],
-            compositionNodes: []
+            id       : idCounter(),
+            x        : xyCord[0],
+            y        : xyCord[1],
+            neighbors: [],
+            children : []
         };
 
         thisGraph.nodes.push(node);
@@ -567,7 +567,7 @@ Graph.prototype.updateGraph = function () {
     newGs.append("foreignObject")
         .append("xhtml:body")
         .html(function (d) {
-            return `<p style="float:none">${d.compositionNodes.length}</p>`;
+            return `<p style="float:none">${d.children.length}</p>`;
         });
 
 

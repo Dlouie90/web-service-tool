@@ -20,21 +20,24 @@ angular.module("WebserviceApp.Controllers")
             $scope.selectedPage      = 1;
             $scope.pageSize          = constant.PROJECT_PER_PAGE;
 
-            $scope.sidebarOptions = [
-                {name: "Graph", url: ""},
-                {name: "Overview", url: ""},
-                {name: "Reports", url: ""},
-                {name: "Analytic", url: ""},
-                {name: "History", url: ""},
+            $scope.topics = [
+                {topic: "Graph"},
+                {topic: "Summary"},
+                // {topic: "Overview"},  // max call stack
+                // {topic: "Reports"},   // max call stack
+                {topic: "Analytic"},
+                {topic: "History"},
             ];
 
             $scope.number         = null;
             $scope.plot           = {};
             $scope.selectedOption = undefined;
 
+            $scope.selectedTopic = "";
 
             $scope.compositionLevels = [];
 
+            $scope.circlePack = {data: {}};
 
             /* =============== Author buttons functions =============== */
 
@@ -84,9 +87,10 @@ angular.module("WebserviceApp.Controllers")
             /* =============== Pagination functions =============== */
 
 
-            $scope.selectPage   = function (page) {
+            $scope.selectPage = function (page) {
                 $scope.selectedPage = page;
             };
+
             $scope.getPageClass = function (page) {
                 return $scope.selectedPage == page ? constant.ACTIVE_BTN_CSS : ""
             };
@@ -101,7 +105,7 @@ angular.module("WebserviceApp.Controllers")
             $scope.getOptionClass = function (option) {
 
                 if ($scope.selectedOption)
-                    return $scope.selectedOption.name == option.name ? constant.ACTIVE_CSS : "";
+                    return $scope.selectedOption.name == option.name ? constant.ACTIVE_BTN_CSS : "";
                 else
                     return "";
             };
@@ -114,6 +118,19 @@ angular.module("WebserviceApp.Controllers")
                 return $scope.activeProject;
             };
 
+            $scope.displayTopic = topicStr => {
+                $scope.selectedTopic = topicStr;
+                switch (topicStr) {
+                    case "Graph":
+                        $scope.loadGraph();
+                        break;
+                    case "Summary":
+                        $scope.circlePack.data =
+                            ProjectFactory.getCirclePackData();
+                        break;
+                }
+
+            };
             /* =============== GRAPH FUNCTIONS =============== */
 
             $scope.saveGraph = function () {

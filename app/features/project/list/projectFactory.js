@@ -81,6 +81,7 @@ angular.module("WebserviceApp.Services")
             activeProject.graph = new Graph(
                 svg, recentState.nodes, recentState.parentNode);
             activeProject.graph.updateGraph();
+
         }
 
 
@@ -185,7 +186,7 @@ angular.module("WebserviceApp.Services")
                      * composition nodes "up" the graph to be synchronize later. */
                     if (currentParentNode) {
                         Object.assign(currentParentNode,
-                            {compositionNodes: nodes});
+                            {children: nodes});
                     }
 
                     /* Build "upward" to the the root. At the top, parentNode
@@ -269,7 +270,7 @@ angular.module("WebserviceApp.Services")
                 /* This is state of the node that the users want to view
                  * the composition of. */
                 let parentNode = selectedNode;
-                let nodes      = selectedNode.compositionNodes || [];
+                let nodes      = selectedNode.children || [];
 
                 /* Whatever state that is on top of the  history stack will
                  * be used to generate the display. The composition view is
@@ -324,5 +325,13 @@ angular.module("WebserviceApp.Services")
             setChartDataArrayFactory: array => {
                 activeProject.chart.data = array;
             },
+
+            getCirclePackData() {
+                return JSON.parse(JSON.stringify({
+                    id      : null,
+                    children: [...activeProject.nodes]
+                }));
+            },
+
         }
     });
