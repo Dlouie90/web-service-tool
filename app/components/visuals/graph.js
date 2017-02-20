@@ -452,7 +452,7 @@ Graph.prototype.currentState = function () {
 
 
 /**  Return a "start-up" graph. Default graph. */
-Graph.prototype.defaultState = function () {
+Graph.defaultState = function () {
     /* Create two default nodes with an edge. */
     const node0 = new Node(idCounter(), 575 - 200, 100);  // default neighbors,
     const node1 = new Node(idCounter(), 575, 100);        // composition = []

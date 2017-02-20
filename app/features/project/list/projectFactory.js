@@ -12,8 +12,11 @@ class Project {
         /** graph object represents the webservice visuals */
         this.graph = {};
 
-        /** The "main" node that all other node originate from. */
-        this.nodes = [];
+        /** List of "main" current nodes. */
+        this.currentNodes = [];
+
+        /** List of all the SAVED "main" nodes. */
+        this.savedNodes = [];
 
         /** array of webservice "run performance" values */
         this.dataReport = [];
@@ -84,13 +87,12 @@ angular.module("WebserviceApp.Services")
 
         }
 
-
         /** Clear out the Main graph and start over; empty the graph. */
         function _resetGraph() {
             /* Reset the history state stack with the default state,
              * the state of all new graph. */
-            let defaultState             = Graph.prototype.defaultState();
-            activeProject.nodes          = defaultState.nodes;
+            let defaultState             = Graph.defaultState();
+            activeProject.currentNodes   = defaultState.nodes;
             activeProject.history.states = [defaultState];
 
             /* Draw a graph of the state on top of the history stack */
@@ -205,7 +207,8 @@ angular.module("WebserviceApp.Services")
 
                 /* The active project nodes now contains a list of all the nodes
                  * and all the nodes that each node is made up. */
-                activeProject.nodes = ROOT_STATE.nodes;
+                activeProject.currentNodes = ROOT_STATE.nodes;
+                activeProject.savedNodes   = ROOT_STATE.nodes;
             },
 
             /** Clear out the Main graph and start over; empty the graph. */
@@ -216,11 +219,11 @@ angular.module("WebserviceApp.Services")
             // load whatever graph the current project contains
             loadGraph: () => {
                 /* load project nodes otherwise load a default state */
-                if (activeProject.nodes.length > 0) {
+                if (activeProject.savedNodes.length !== 0) {
 
                     /* init history list for the current view */
                     let history    = activeProject.history;
-                    history.states = [new State(activeProject.nodes)];
+                    history.states = [new State(activeProject.savedNodes)];
 
                     /* Draw a graph of the state on top of the history stack */
                     drawCurrentState();
@@ -326,10 +329,11 @@ angular.module("WebserviceApp.Services")
                 activeProject.chart.data = array;
             },
 
+            /* =============== VISUALIZATION FUNCTIONS =============== */
             getCirclePackData() {
                 return JSON.parse(JSON.stringify({
                     id      : null,
-                    children: [...activeProject.nodes]
+                    children: [...activeProject.currentNodes]
                 }));
             },
 
