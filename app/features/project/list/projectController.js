@@ -37,7 +37,7 @@ angular.module("WebserviceApp.Controllers")
 
             $scope.compositionLevels = [];
 
-            $scope.circlePack = {data: {}};
+            $scope.circlePack = [];
 
             /* =============== Author buttons functions =============== */
 
@@ -119,16 +119,16 @@ angular.module("WebserviceApp.Controllers")
             };
 
             $scope.displayTopic = topicStr => {
-                $scope.selectedTopic = topicStr;
                 switch (topicStr) {
                     case "Graph":
                         $scope.loadGraph();
                         break;
                     case "Summary":
-                        $scope.circlePack.data =
+                        $scope.circlePack =
                             ProjectFactory.getCirclePackData();
                         break;
                 }
+                $scope.selectedTopic = topicStr;
 
             };
             /* =============== GRAPH FUNCTIONS =============== */

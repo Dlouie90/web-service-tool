@@ -3,7 +3,6 @@ angular.module("WebserviceApp.Directives")
         function link(scope, element, attrs) {
 
             scope.$watch('data', function (newData) {
-                console.log("circle-pack", newData);
                 let data    = newData;
                 const WIDTH = 500;
                 const c10   = d3.scale.category20c();
@@ -40,12 +39,12 @@ angular.module("WebserviceApp.Directives")
                     })
                     .attr("stroke", "grey")
                     .attr("r", d => d.r)
-                    .on("mouseout", () => {
+                    .on("mouseout", function () {
                         d3.select(this).attr("stroke", "grey")
                             .style("stroke-width", 0)
 
                     })
-                    .on("mouseover", () => {
+                    .on("mouseover", function () {
                         d3.select(this).attr("stroke", "black")
                             .style("stroke-width", 5)
                     });

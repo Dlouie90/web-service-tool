@@ -108,6 +108,31 @@ angular.module("WebserviceApp.Services")
             activeProject.history.states.push(currentState);
         }
 
+        /** Recursively removes "Input"/"Output" (Not regular) nodes
+         * from the input.children */
+        function removeIrregularNodes(inputNode) {
+            for (let i = 0; i < inputNode.children.length; i++) {
+                let node = inputNode.children[i];
+
+                /* Remove the "Input/Output" node. After removal, the array
+                 * is re-indexed so we decrement the counter  (i--) */
+                if (!Node.isRegular(node)) {
+                    inputNode.children.splice(i, 1);
+                    i--;
+                }
+            }
+
+            /* For all the normal nodes left, RECURSIVELY remove the input/output
+             * node from THEIR children. */
+            for (let i = 0; i < inputNode.children.length; i++) {
+                let node = inputNode.children[i];
+                if (node.children.length > 0) {
+                    node = removeIrregularNodes(node);
+                }
+            }
+            return inputNode;
+        }
+
         /* =============== FACTORY FUNCTIONS =============== */
         return {
             addProject: project => {
@@ -259,12 +284,13 @@ angular.module("WebserviceApp.Services")
             /** View the composition of the the currently selected node.
              * (Display the nodes of nodes) */
             viewComposition: () => {
-                /* Ensure that the user selected a node first.
-                 * TODO: Alert user when they don't have a node selected. */
-                if (!activeProject.graph.state.selectedNode)  return;
-
                 /* The node that the user clicks on.*/
-                let selectedNode = activeProject.graph.state.selectedNode;
+                const selectedNode = activeProject.graph.state.selectedNode;
+
+                /* Ensure that the user selected a node first and it is NOT
+                 * an output/input node.
+                 * TODO: Alert user when they don't have a node selected. */
+                if (!selectedNode || !Node.isRegular(selectedNode))  return;
 
                 /* Update the current state before so the changes the user made
                  * will be saved at the state level. */
@@ -273,7 +299,7 @@ angular.module("WebserviceApp.Services")
                 /* This is state of the node that the users want to view
                  * the composition of. */
                 let parentNode = selectedNode;
-                let nodes      = selectedNode.children || [];
+                let nodes      = selectedNode.children.length === 0 ? Graph.defaultState().nodes : selectedNode.children;
 
                 /* Whatever state that is on top of the  history stack will
                  * be used to generate the display. The composition view is
@@ -321,7 +347,7 @@ angular.module("WebserviceApp.Services")
                     x: Math.random() * 10,
                     y: Math.random() * 10,
                     r: 15,
-                    h: false
+
                 });
             },
 
@@ -330,12 +356,17 @@ angular.module("WebserviceApp.Services")
             },
 
             /* =============== VISUALIZATION FUNCTIONS =============== */
-            getCirclePackData() {
-                return JSON.parse(JSON.stringify({
-                    id      : null,
-                    children: [...activeProject.currentNodes]
-                }));
-            },
 
+            /** Return the node composition with all the irregular
+             * (input/output) nodes removed. */
+            getCirclePackData() {
+                let clonedRootNode = JSON.parse(JSON.stringify({
+                    /* TODO: maybe assign the root node an id?, all are null */
+                    id      : null,
+                    children: activeProject.currentNodes
+                }));
+
+                return removeIrregularNodes(clonedRootNode);
+            }
         }
     });

@@ -11,14 +11,20 @@ class State {
 }
 
 class Node {
-    constructor(id, x, y, neighbors = [], children = []) {
-        /* todo: change neighbors name to siblings
-         * todo: change compositionNodes to children. */
+    constructor(id, x, y) {
+        /* todo: change neighbors name to siblings */
         this.id        = id;
         this.x         = x;
         this.y         = y;
-        this.neighbors = neighbors;
-        this.children  = children;
+        this.neighbors = [];
+        this.children  = [];
+        this.isInput   = false;
+        this.isOutput  = false;
+    }
+
+    /** Return true if the node is neither a input or output node. */
+    static isRegular(node) {
+        return !(node.isInput || node.isOutput);
     }
 
     /*TODO: write a static method that clones the node*/
@@ -68,7 +74,6 @@ function findNeighbor(nodes, neighbor) {
         if (node.id === neighbor.id)
             return node;
     }
-    console.error("findNeighbor function error");
 }
 
 function Graph(svgIn, nodesIn, parentNode = undefined) {
@@ -329,20 +334,19 @@ Graph.prototype.circleMouseUp = function (d3node, d) {
     state.mouseDownNode = null;
 };
 
-/** Remove all the  edges associated with a node.
- *  Used after a node is deleted to delete all the edges connected to it.
- */
-Graph.prototype.spliceLinksForNode = function (node) {
-    var thisGraph = this;
+/** Remove all the edges associated with a node.
+ *  Used after a node is deleted to delete all the edges connected to it. */
+Graph.prototype.spliceLinksFormNode = function (node) {
+    const thisGraph = this;
 
-    // get a list of all the edges to removed
-    var toSplice = thisGraph.edges.filter(function (l) {
-        return (l.source === node || l.target === node);
+    /* Get a list of all the edges to removed. */
+    const toSplice = thisGraph.edges.filter(edge => {
+        return (edge.source.id === node.id || edge.target.id === node.id);
     });
 
-    // remove each edges from the graph
-    toSplice.forEach(function (l) {
-        thisGraph.edges.splice(thisGraph.edges.indexOf(l), 1);
+    /* remove each edges from the graph. */
+    toSplice.forEach(edge => {
+        thisGraph.edges.splice(thisGraph.edges.indexOf(edge), 1);
     });
 };
 
@@ -390,9 +394,16 @@ Graph.prototype.svgKeyDown = function () {
         case final.BACK_SPACE_KEY:
         case final.DELETE_KEY:
             d3.event.preventDefault();
-            if (selectedNode) {
+
+            /* Can only delete selected node that are not an input/output node. */
+            if (selectedNode && Node.isRegular(selectedNode)) {
+                /* Remove the node form the list. */
                 thisGraph.nodes.splice(thisGraph.nodes.indexOf(selectedNode), 1);
-                thisGraph.spliceLinksForNode(selectedNode);
+                /* Remove all edges originating from this node. */
+                thisGraph.spliceLinksFormNode(selectedNode);
+                /* Remove the node from all neighbors field */
+                removeFromNeighbor(this.nodes, selectedNode);
+
                 state.selectedNode = null;
                 thisGraph.updateGraph();
             } else if (selectedEdge) {
@@ -413,15 +424,25 @@ Graph.prototype.svgKeyDown = function () {
 function removeEdge(nodes, edge) {
     /* This is the source node that is in the nodes array. */
     const node = nodes.filter(currentNode => {
-        return currentNode.id === edge.source.id;
+        return currentNode.id == edge.source.id;
     }) [0];
 
     /* Remove the target node from the node neighbors field. */
     node.neighbors = node.neighbors.filter(currentNode => {
-        return currentNode.id !== edge.target.id;
-    })
+        return currentNode.id != edge.target.id;
+    });
 }
 
+/** Remove the nodeToRemove from all nodes.neighbor field */
+function removeFromNeighbor(nodes, nodeToRemove) {
+    nodes.forEach(node => {
+        node.neighbors.forEach((neighbor, index) => {
+            if (neighbor.id === nodeToRemove.id) {
+                node.neighbors.splice(index, 1);
+            }
+        });
+    })
+}
 
 // mousedown on main svg
 Graph.prototype.svgMouseDown = function () {
@@ -433,18 +454,12 @@ Graph.prototype.svgMouseDown = function () {
  * click on the graph
  */
 Graph.prototype.svgMouseUp = function () {
-    var thisGraph = this;
-    var state     = thisGraph.state;
+    const thisGraph = this;
+    const state     = thisGraph.state;
 
     if (state.graphMouseDown && d3.event.shiftKey) {
-        var xyCord = d3.mouse(thisGraph.svgG.node());
-        var node   = {
-            id       : idCounter(),
-            x        : xyCord[0],
-            y        : xyCord[1],
-            neighbors: [],
-            children : []
-        };
+        const xyCord = d3.mouse(thisGraph.svgG.node());
+        const node   = new Node(idCounter(), xyCord[0], xyCord[1]);
 
         thisGraph.nodes.push(node);
         thisGraph.updateGraph();
@@ -473,15 +488,19 @@ Graph.prototype.currentState = function () {
 
 /**  Return a "start-up" graph. Default graph. */
 Graph.defaultState = function () {
-    /* Create two default nodes with an edge. */
-    const node0 = new Node(idCounter(), 575 - 200, 100);  // default neighbors,
-    const node1 = new Node(idCounter(), 575, 100);        // composition = []
-    node0.neighbors.push(node1);
+    /* Create 3 default nodes: regular, input, output node. */
+    const input     = new Node(idCounter(), 100, 100);    // default neighbors,
+    const output    = new Node(idCounter(), 750, 100);    // composition = []
+    input.isInput   = true;
+    output.isOutput = true;
+
+    /* There should be an edge between the input and a regular node, and
+     * another between the regular and the output.*/
+    input.neighbors.push(output);
 
     /* Default state with no parentNode. */
-    return new State([node0, node1]);
+    return new State([input, output]);
 };
-
 
 /** Copy and return the copy. */
 function copyObject(object) {
@@ -579,7 +598,11 @@ Graph.prototype.updateGraph = function () {
         .attr("text-anchor", "middle")
         .style("font", "14px 'Helvetica Neue'")
         .text(function (d) {
-            return `name: ${d.id}`;
+            if (Node.isRegular(d)) {
+                return `name: ${d.id}`;
+            } else {
+                return d.isInput ? "Input" : "Output";
+            }
         });
 
     /* Attach an html element onto the circle that display the number
@@ -587,9 +610,12 @@ Graph.prototype.updateGraph = function () {
     newGs.append("foreignObject")
         .append("xhtml:body")
         .html(function (d) {
-            return `<p style="float:none">${d.children.length}</p>`;
+            if (Node.isRegular(d) && d.children.length - 2 > 0) {
+                /* Minus 2 because we don't want to include the input/output
+                 * nodes that every list of nodes contains */
+                return `<p style="float:none">${d.children.length - 2}</p>`;
+            }
         });
-
 
     // remove old nodes;
     thisGraph.circles.exit().remove();
