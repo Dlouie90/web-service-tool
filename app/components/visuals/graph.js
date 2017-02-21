@@ -396,12 +396,32 @@ Graph.prototype.svgKeyDown = function () {
                 state.selectedNode = null;
                 thisGraph.updateGraph();
             } else if (selectedEdge) {
+                /* Remove the edge from the edge list */
                 thisGraph.edges.splice(thisGraph.edges.indexOf(selectedEdge), 1);
+
+                /* Remove the edge from the node list too. */
+                removeEdge(thisGraph.nodes, selectedEdge);
+
                 state.selectedEdge = null;
                 thisGraph.updateGraph();
             }
     }
 };
+
+/** Remove the edges from the nodes list. An edge exist between a node
+ * and its neighbor's node. */
+function removeEdge(nodes, edge) {
+    /* This is the source node that is in the nodes array. */
+    const node = nodes.filter(currentNode => {
+        return currentNode.id === edge.source.id;
+    }) [0];
+
+    /* Remove the target node from the node neighbors field. */
+    node.neighbors = node.neighbors.filter(currentNode => {
+        return currentNode.id !== edge.target.id;
+    })
+}
+
 
 // mousedown on main svg
 Graph.prototype.svgMouseDown = function () {
