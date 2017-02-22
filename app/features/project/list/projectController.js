@@ -1,117 +1,101 @@
-/** * Created by shay on 10/12/16. */
-
 angular.module("WebserviceApp.Controllers")
     .controller("ProjectCtrl",
-        function ($scope, $filter, $http, ProjectFactory, ConstantFactory) {
-
-            // for convinces
-            const constant = ConstantFactory;
+        ($scope, $filter, $http, ProjectFactory, constFactory) => {
 
             let selectedAuthor = null;
-
-            let runBtnToggle = false;
-
-            // default text, can be toggle to 'Stop Project"
-            let runBtnText = "Run Project";
 
             $scope.activeProject     = ProjectFactory.getActiveProject();
             $scope.projectToBeEdited = {};
             $scope.projects          = ProjectFactory.getProjects();
             $scope.selectedPage      = 1;
-            $scope.pageSize          = constant.PROJECT_PER_PAGE;
+            $scope.pageSize          = constFactory.PROJECT_PER_PAGE;
 
             $scope.topics = [
                 {topic: "Graph"},
                 {topic: "Summary"},
-                {topic: "Analytic"},
-                {topic: "History"},
+                {topic: "Execute"},
+                {topic: "Import"},
+                {topic: "Export"},
             ];
 
-            $scope.number         = null;
-            $scope.plot           = {};
-            $scope.selectedOption = undefined;
-
-            $scope.selectedTopic = "";
-
+            $scope.selectedOption    = undefined;
+            $scope.selectedTopic     = "";
             $scope.compositionLevels = [];
-
-            $scope.circlePack = [];
+            $scope.circlePack        = [];
 
             /* =============== Author buttons functions =============== */
 
 
-            $scope.selectAuthor   = function (author) {
+            $scope.selectAuthor   = author => {
                 selectedAuthor      = author;
                 $scope.selectedPage = 1;
             };
-            $scope.getAuthorClass = function (author) {
-                return selectedAuthor == author ? constant.ACTIVE_BTN_CSS : "";
+            $scope.getAuthorClass = author => {
+                return selectedAuthor == author ?
+                    constFactory.ACTIVE_BTN_CSS : "";
             };
 
-            $scope.authorFilter = function (project) {
+            $scope.authorFilter = project => {
                 return selectedAuthor == null ||
                     project.author == selectedAuthor;
             };
 
-            $scope.getAuthorCount = function (author) {
-                var count = 0;
-                angular.forEach($scope.projects, function (project) {
-                    if (project.author == author)
-                        count++;
-                });
-
-                return count;
+            $scope.getAuthorCount = author => {
+                return $scope.projects.reduce((count, project) => {
+                    return project.author == author ? count + 1 : count;
+                }, 0)
             };
 
             /* =============== Project Panel functions =============== */
-            $scope.getPanelClass = function (project) {
-                return ProjectFactory.getActiveProject().id == project.id
-                    ? constant.ACTIVE_PANEL_CSS : ""
+            $scope.getPanelClass = project => {
+                return ProjectFactory.getActiveProject().id == project.id ?
+                    constFactory.ACTIVE_PANEL_CSS : ""
             };
-            $scope.selectPanel   = function (project) {
+            $scope.selectPanel   = project => {
                 ProjectFactory.setActiveProject(project.id);
                 $scope.selectedOption = undefined;
             };
 
-            $scope.editProject = function (project) {
+            $scope.editProject = project => {
                 $scope.projectToBeEdited = project;
             };
 
-            $scope.deleteProject = function (project) {
+            $scope.deleteProject = project => {
                 ProjectFactory.removeProject(project);
                 $scope.projects = ProjectFactory.getProjects();
             };
 
             /* =============== Pagination functions =============== */
 
-
-            $scope.selectPage = function (page) {
+            $scope.selectPage = page => {
                 $scope.selectedPage = page;
             };
 
-            $scope.getPageClass = function (page) {
-                return $scope.selectedPage == page ? constant.ACTIVE_BTN_CSS : ""
+            $scope.getPageClass = page => {
+                return $scope.selectedPage == page ?
+                    constFactory.ACTIVE_BTN_CSS : ""
             };
 
             /* =============== SIDE BAR OPTIONS  FUNCTIONS =============== */
 
-
-            $scope.selectOption   = function (option) {
+            $scope.selectOption = option => {
                 $scope.selectedOption = option;
                 ProjectFactory.clearGraph();
             };
-            $scope.getOptionClass = function (option) {
 
-                if ($scope.selectedOption)
-                    return $scope.selectedOption.name == option.name ? constant.ACTIVE_BTN_CSS : "";
-                else
-                    return "";
+            $scope.getOptionClass = option => {
+
+                if ($scope.selectedOption) {
+                    return $scope.selectedOption.name == option.name
+                        ? constFactory.ACTIVE_BTN_CSS : "";
+                }
+
+                return "";
             };
 
             /* =============== PROJECT FUNCTIONS =============== */
 
-
-            $scope.getActiveProject = function () {
+            $scope.getActiveProject = () => {
                 $scope.activeProject = ProjectFactory.getActiveProject();
                 return $scope.activeProject;
             };
@@ -131,55 +115,35 @@ angular.module("WebserviceApp.Controllers")
             };
             /* =============== GRAPH FUNCTIONS =============== */
 
-            $scope.saveGraph = function () {
+            $scope.saveGraph = () => {
                 ProjectFactory.saveGraph();
                 updateCompositionLevels();
             };
 
-            $scope.resetGraph = function () {
+            $scope.resetGraph = () => {
                 ProjectFactory.resetGraph();
                 updateCompositionLevels();
             };
 
-            $scope.loadGraph = function () {
+            $scope.loadGraph = () => {
                 ProjectFactory.loadGraph();
                 updateCompositionLevels();
             };
 
-            $scope.goBackOneLevel = function () {
+            $scope.goBackOneLevel = () => {
                 ProjectFactory.goBackOneLevel();
                 updateCompositionLevels();
             };
 
-
-            $scope.viewComposition = function () {
+            $scope.viewComposition = () => {
                 ProjectFactory.viewComposition();
                 updateCompositionLevels();
             };
-
 
             $scope.jumpToState = index => {
                 ProjectFactory.updateToState(index);
                 updateCompositionLevels();
             };
-
-            /* =============== BUTTONS FUNCTIONS =============== */
-
-            $scope.getIconClass = function () {
-                return runBtnToggle ? constant.SPIN_ICON : ""
-            };
-
-            // display the "run" attribute text as the default text (when
-            // the page is first loaded, else return the text field .
-
-            $scope.displayBtnText = function () {
-                return runBtnText;
-            };
-
-            $scope.getBtnClass = function () {
-                return runBtnToggle ? constant.CANCEL_BTN_CSS : constant.DEFAULT_BTN_CSS;
-            };
-
 
             /* =============== NON $SCOPE FUNCTIONS =============== */
             /** Generate a list of parent's node id from the states track.
@@ -191,7 +155,4 @@ angular.module("WebserviceApp.Controllers")
                     return state.parentNode ? `ID# ${state.parentNode.id}` : "ROOT";
                 })
             }
-
         });
-
-

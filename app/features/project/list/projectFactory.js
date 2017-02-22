@@ -311,9 +311,6 @@ angular.module("WebserviceApp.Services")
                 drawCurrentState();
             },
 
-            /* ====== PERFORMANCES, RECORD, HISTORY DATA OPERATIONS  ======*/
-
-
 
             /* =============== VISUALIZATION FUNCTIONS =============== */
 

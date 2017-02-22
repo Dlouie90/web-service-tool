@@ -2,7 +2,7 @@
  * This factory contains all the constants used throughout the project
  */
 angular.module("WebserviceApp.Services")
-    .factory("ConstantFactory", function () {
+    .factory("constFactory", function () {
         return {
             ACTIVE_CSS      : "active",
             ACTIVE_BTN_CSS  : "btn-primary",
