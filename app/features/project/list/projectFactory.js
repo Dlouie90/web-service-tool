@@ -25,24 +25,6 @@ class Project {
         this.history = {
             states: []    // a stack
         };
-
-        /** Overview scatter plot demo data */
-        this.scatterData = [];
-
-        /** Default chart demo data (unrelated to webservice) */
-        this.chart = {
-            data: [
-                {letter: "A", count: 19},
-                {letter: "E", count: 5},
-                {letter: "I", count: 13},
-                {letter: "O", count: 17},
-                {letter: "U", count: 9},
-                {letter: "L", count: 3},
-                {letter: "B", count: 21},
-                {letter: "R", count: 0},
-                {letter: "N", count: 5}
-            ],
-        }
     }
 }
 
@@ -331,29 +313,7 @@ angular.module("WebserviceApp.Services")
 
             /* ====== PERFORMANCES, RECORD, HISTORY DATA OPERATIONS  ======*/
 
-            /**
-             * TODO: use real data instead of generating fake data;
-             * generate fake performance data from 1-100 and push it into the
-             * the activeProject dataReport array
-             */
-            generateRandomData: () => {
-                let min        = 1, max = 100;
-                let randomData = Math.floor(Math.random() * (max - min + 1)) + min;
-                activeProject.dataReport.push(randomData);
-            },
 
-            generateScatterPlotDataFactory: () => {
-                activeProject.scatterData.push({
-                    x: Math.random() * 10,
-                    y: Math.random() * 10,
-                    r: 15,
-
-                });
-            },
-
-            setChartDataArrayFactory: array => {
-                activeProject.chart.data = array;
-            },
 
             /* =============== VISUALIZATION FUNCTIONS =============== */
 

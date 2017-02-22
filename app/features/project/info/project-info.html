@@ -74,24 +74,6 @@
                                 data-toggle="modal" data-target=".composition-view">
                             Composition View
                         </button>
-
-                        <button class="btn btn-default hvr-icon-back"
-                                data-toggle="modal" data-target=".edit-node">
-                            Edit node
-                        </button>
-
-
-                        <!-- run project btn-->
-                        <button data-trigger="hover" data-placement="bottom"
-                                class="btn" ng-class="getBtnClass()"
-                                title="Start the project"
-                                ng-click="toggleRunBtn(run,stop);">
-                            {{displayBtnText('Run Project')}}
-                            <i class="fa fa-cog fa-fw "
-                               ng-class="getIconClass()">
-                            </i>
-                        </button>
-
                     </div>
 
                     <ol class="breadcrumb">
@@ -112,62 +94,6 @@
                     Summary!!!
                     <circle-pack data="circlePack"></circle-pack>
                 </div>
-
-                <div ng-switch-when="Overview">
-
-                    <form class="form-inline">
-                        <div class="form-group">
-                            <label for="exampleInputName2">Enter Number</label>
-                            <input ng-model="plot.number" class="form-control"
-                                   id="exampleInputName2" placeholder="20">
-                            <ws-log>{{plot.number}}</ws-log>
-                        </div>
-                        <button type="submit" class="btn btn-default"
-                                ng-click="generateScatterPlotData()">Test
-                        </button>
-                    </form>
-
-                    <scatter-plot data="activeProject"></scatter-plot>
-                </div>
-
-                <!-- report bar chart # 1-->
-                <div ng-switch-when="Reports">
-                    <!-- run project btn-->
-                    <button data-trigger="hover" data-placement="bottom"
-                            class="btn" ng-class="getBtnClass()"
-                            title="Start the project"
-                            ng-click="toggleRunBtn(run,stop);">
-                        {{displayBtnText('Run Project')}}
-                        <i class="fa fa-cog fa-fw " ng-class="getIconClass()">
-                        </i>
-                    </button>
-                    <hr/>
-
-                    <ws-log>Reports: {{activeProject.dataReport.length}}
-                    </ws-log>
-                    <bar-chart data="activeProject"></bar-chart>
-                </div>
-
-
-                <div ng-switch-when="History">
-                    <form class="col-sm-6">
-                        <label for="web-service-string">Enter Text</label>
-                        <textarea ng-model="text" id="web-service-string"
-                                  class="form-control" rows="1"></textarea>
-                        <button ng-click="webservice(text)" type="button"
-                                class="btn btn-primary">Submit
-                        </button>
-                    </form>
-                    <horizontal-bar-chart
-                            data="activeProject"></horizontal-bar-chart>
-                </div>
-
-
-                <div ng-switch-when="Analytic">
-                    <p><code>Analytic</code></p>
-                    <line-chart></line-chart>
-                </div>
-
 
                 <div ng-switch-default>
                     <code>{{selectedOption}}" Nothing here yet!. Select another

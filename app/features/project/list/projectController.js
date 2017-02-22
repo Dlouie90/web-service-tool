@@ -7,12 +7,12 @@ angular.module("WebserviceApp.Controllers")
             // for convinces
             const constant = ConstantFactory;
 
-            var selectedAuthor = null;
+            let selectedAuthor = null;
 
-            var runBtnToggle = false;
+            let runBtnToggle = false;
 
             // default text, can be toggle to 'Stop Project"
-            var runBtnText = "Run Project";
+            let runBtnText = "Run Project";
 
             $scope.activeProject     = ProjectFactory.getActiveProject();
             $scope.projectToBeEdited = {};
@@ -23,8 +23,6 @@ angular.module("WebserviceApp.Controllers")
             $scope.topics = [
                 {topic: "Graph"},
                 {topic: "Summary"},
-                // {topic: "Overview"},  // max call stack
-                // {topic: "Reports"},   // max call stack
                 {topic: "Analytic"},
                 {topic: "History"},
             ];
@@ -148,30 +146,6 @@ angular.module("WebserviceApp.Controllers")
                 updateCompositionLevels();
             };
 
-            $scope.generateScatterPlotData = function () {
-                for (var i = 0; i < $scope.plot.number; i++) {
-                    ProjectFactory.generateScatterPlotDataFactory();
-                }
-                $scope.plot = {};
-            };
-
-            /* Count the frequency of letters in the user submitted text. Ignore all
-             * other characters.  See CharFactory.js for the expected json object format
-             * */
-
-            $scope.webservice     = function (userText) {
-                console.log("CALLED");
-                var userData = {text: userText};
-                var url      = "/api/letters";
-                $http.post(url, userData).then(
-                    function success(response) {
-                        ProjectFactory.setChartDataArrayFactory(response.data.data)
-                    },
-                    function error(response) {
-                        console.log(response.status, response.statusText);
-                    })
-
-            };
             $scope.goBackOneLevel = function () {
                 ProjectFactory.goBackOneLevel();
                 updateCompositionLevels();
@@ -190,16 +164,6 @@ angular.module("WebserviceApp.Controllers")
             };
 
             /* =============== BUTTONS FUNCTIONS =============== */
-
-            $scope.toggleRunBtn = function () {
-                runBtnToggle = !runBtnToggle;
-                runBtnToggle ? constant.runBtnText = "Stop Project" : runBtnText = "Run Project";
-
-                // push random data to activeProject report whenever a project's
-                // webservice is run
-                if (runBtnToggle) ProjectFactory.generateRandomData();
-
-            };
 
             $scope.getIconClass = function () {
                 return runBtnToggle ? constant.SPIN_ICON : ""
