@@ -1,15 +1,15 @@
 <!-- main container -->
 <div class="row">
     <!-- author category list container -->
-    <div class="col-xs-3">
+    <div class="col-sm-2">
         <!-- the default button -->
-        <a ng-click="selectAuthor()" class="btn btn-block btn-default btn-lg">
+        <a ng-click="selectAuthor()" class="btn btn-block btn-default">
             All
         </a>
         <!-- the buttons for each category (author) -->
         <a ng-repeat="author in projects | orderBy:'author' | unique: 'author'"
            ng-click="selectAuthor(author)"
-           class="btn btn-block btn-default btn-lg"
+           class="btn btn-block btn-default"
            ng-class="getAuthorClass(author)">
             {{author}} <span class="badge pull-right">{{ getAuthorCount(author) }}</span>
         </a>
@@ -17,7 +17,7 @@
 
 
     <!-- project list container -->
-    <div class="col-xs-8">
+    <div class="col-sm-10">
         <!-- container for all the projects and its information -->
         <div ng-repeat="project in projects | filter:authorFilter |
                           range:selectedPage:pageSize">
