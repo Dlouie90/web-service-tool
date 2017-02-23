@@ -311,12 +311,11 @@ angular.module("WebserviceApp.Services")
                 drawCurrentState();
             },
 
-
             /* =============== VISUALIZATION FUNCTIONS =============== */
 
             /** Return the node composition with all the irregular
              * (input/output) nodes removed. */
-            getCirclePackData() {
+            getParsedNodes() {
                 let clonedRootNode = JSON.parse(JSON.stringify({
                     /* TODO: maybe assign the root node an id?, all are null */
                     id      : null,

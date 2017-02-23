@@ -13,7 +13,7 @@ angular.module("WebserviceApp.Controllers")
             $scope.topics = [
                 {topic: "Graph"},
                 {topic: "Summary"},
-                {topic: "Execute"},
+                {topic: "Run"},
                 {topic: "Import"},
                 {topic: "Export"},
             ];
@@ -22,6 +22,8 @@ angular.module("WebserviceApp.Controllers")
             $scope.selectedTopic     = "";
             $scope.compositionLevels = [];
             $scope.circlePack        = [];
+
+            $scope.serviceResult = "NONE";
 
             /* =============== Author buttons functions =============== */
 
@@ -107,7 +109,10 @@ angular.module("WebserviceApp.Controllers")
                         break;
                     case "Summary":
                         $scope.circlePack =
-                            ProjectFactory.getCirclePackData();
+                            ProjectFactory.getParsedNodes();
+                        break;
+                    case "Run":
+                        $scope.runService();
                         break;
                 }
                 $scope.selectedTopic = topicStr;
@@ -143,6 +148,23 @@ angular.module("WebserviceApp.Controllers")
             $scope.jumpToState = index => {
                 ProjectFactory.updateToState(index);
                 updateCompositionLevels();
+            };
+
+
+            $scope.runService = () => {
+                const url = "http://localhost:3000/api/run";
+
+                $http.post(url, ProjectFactory.getParsedNodes())
+                    .then(result => {
+                        $scope.serviceResult = result;
+                    })
+                    .catch(error => {
+                        console.log("failed");
+                        console.log(error);
+
+                        $scope.serviceResult = error;
+                    });
+
             };
 
             /* =============== NON $SCOPE FUNCTIONS =============== */

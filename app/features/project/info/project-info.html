@@ -91,8 +91,14 @@
 
                 <!-- overview scatter plot data (demo) -->
                 <div ng-switch-when="Summary">
-                    Summary!!!
                     <circle-pack data="circlePack"></circle-pack>
+                </div>
+
+                <div ng-switch-when="Run">
+                    <dl class="dl-horizontal">
+                        <dt>Total Execution Time</dt>
+                        <dd>{{serviceResult}}</dd>
+                    </dl>
                 </div>
 
                 <div ng-switch-default>
@@ -137,10 +143,6 @@
             <confirm-box target="composition-view" title="Confirm Composition View"
                          update-fn="viewComposition()"
                          content="Composition View">
-            </confirm-box>
-
-            <confirm-box target="hello world" title="Confirm Composition View"
-                         content="Hello world">
             </confirm-box>
         </div>
 
