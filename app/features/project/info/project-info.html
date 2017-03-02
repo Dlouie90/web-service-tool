@@ -64,14 +64,16 @@
                         <!-- go back one state btn -->
                         <button class="btn btn-default hvr-icon-back"
                                 data-trigger="hover" data-placement="bottom"
-                                data-toggle="modal" data-target=".goBackOneLevel"
+                                data-toggle="modal"
+                                data-target=".goBackOneLevel"
                                 title="Return to the previous level">
                             Go Back One Level
                         </button>
 
                         <!-- go back one state btn -->
                         <button class="btn btn-default hvr-icon-back"
-                                data-toggle="modal" data-target=".composition-view">
+                                data-toggle="modal"
+                                data-target=".composition-view">
                             Composition View
                         </button>
                     </div>
@@ -91,7 +93,39 @@
 
                 <!-- overview scatter plot data (demo) -->
                 <div ng-switch-when="Summary">
-                    <circle-pack data="circlePack"></circle-pack>
+
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="diagram"
+                                   ng-model="diagram" id="diagram-radio-1"
+                                   value="circle">
+                            Circle Pack Diagram
+                        </label>
+                        <label>
+                            <input type="radio" name="diagram"
+                                   ng-model="diagram" id="diagram-radio-2"
+                                   value="tree">
+                            Tree Diagram
+                        </label>
+                        <label>
+                            <input type="radio" name="diagram"
+                                   ng-model="diagram" id="diagram-radio-3"
+                                   value="radial" disabled>
+                            Radial Tree Diagram
+                        </label>
+                    </div>
+
+                    <div ng-switch on="diagram">
+                        <div ng-switch-when="circle">
+                            <circle-pack data="circlePack"></circle-pack>
+                        </div>
+
+                        <div ng-switch-when="tree">
+                            <tree-diagram data="circlePack"></tree-diagram>
+                        </div>
+                    </div>
+
+
                 </div>
 
                 <div ng-switch-when="Run">
@@ -140,7 +174,8 @@
                          content="Go Back One State">
             </confirm-box>
 
-            <confirm-box target="composition-view" title="Confirm Composition View"
+            <confirm-box target="composition-view"
+                         title="Confirm Composition View"
                          update-fn="viewComposition()"
                          content="Composition View">
             </confirm-box>

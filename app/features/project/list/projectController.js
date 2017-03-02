@@ -25,6 +25,8 @@ angular.module("WebserviceApp.Controllers")
 
             $scope.serviceResult = "NONE";
 
+            $scope.diagram = undefined;
+
             /* =============== Author buttons functions =============== */
 
 
