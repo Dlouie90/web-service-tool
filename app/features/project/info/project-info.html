@@ -110,7 +110,7 @@
                         <label>
                             <input type="radio" name="diagram"
                                    ng-model="diagram" id="diagram-radio-3"
-                                   value="radial" disabled>
+                                   value="radial">
                             Radial Tree Diagram
                         </label>
                     </div>
@@ -123,6 +123,10 @@
                         <div ng-switch-when="tree">
                             <tree-diagram data="circlePack"></tree-diagram>
                         </div>
+                        <div ng-switch-when="radial">
+                            <radial-diagram data="circlePack"></radial-diagram>
+                        </div>
+
                     </div>
 
 
