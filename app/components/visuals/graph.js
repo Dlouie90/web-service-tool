@@ -394,7 +394,7 @@ Graph.prototype.svgKeyDown = function () {
     switch (d3.event.keyCode) {
         case final.BACK_SPACE_KEY:
         case final.DELETE_KEY:
-            d3.event.preventDefault();
+            // d3.event.preventDefault();
 
             /* Can only delete selected node that are not an input/output node. */
             if (selectedNode && Node.isRegular(selectedNode)) {
