@@ -20,6 +20,7 @@ class Node {
         this.children  = [];
         this.isInput   = false;
         this.isOutput  = false;
+        this.name      = "webservice-" + id;
     }
 
     /** Return true if the node is neither a input or output node. */

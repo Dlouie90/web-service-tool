@@ -13,6 +13,7 @@ angular.module("WebserviceApp.Controllers")
             $scope.topics = [
                 {topic: "Graph"},
                 {topic: "Summary"},
+                {topic: "Edit"},
                 {topic: "Run"},
                 {topic: "Import"},
                 {topic: "Export"},
@@ -29,6 +30,13 @@ angular.module("WebserviceApp.Controllers")
 
             /* =============== Author buttons functions =============== */
 
+            $scope.hide = (object) => {
+                object.hide = !object.hide;
+            };
+
+            $scope.getHideText = (object) => {
+                return object.hide ? "show (" + object.children.length + ")" : "hide"
+            };
 
             $scope.selectAuthor   = author => {
                 selectedAuthor      = author;
@@ -110,6 +118,10 @@ angular.module("WebserviceApp.Controllers")
                         $scope.loadGraph();
                         break;
                     case "Summary":
+                        $scope.circlePack =
+                            ProjectFactory.getParsedNodes();
+                        break;
+                    case "Edit":
                         $scope.circlePack =
                             ProjectFactory.getParsedNodes();
                         break;

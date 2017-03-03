@@ -1,0 +1,40 @@
+<!-- Modal -->
+<div class="modal fade" ng-class="target" tabindex="-1" role="dialog"
+     aria-labelledby="myEditModalLabel">
+
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <!-- title -->
+                <h4 class="modal-title" id="myEditModalLabel">
+                    edit person
+                </h4>
+            </div>
+            <!-- body content-->
+            <div class="modal-body row">
+                <div class="col-xs-6">
+                    <label>Name:
+                        <input ng-model="object.name" class="form-control">
+                    </label>
+                    <label>ID:
+                        <input ng-model="object.id" class="form-control"
+                               disabled>
+                    </label>
+                    <label>URL:
+                        <input ng-model="object.url" class="form-control">
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <!-- click functions -->
+                <button type="button" data-dismiss="modal"
+                        class="btn btn-primary">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

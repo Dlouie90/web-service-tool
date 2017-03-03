@@ -1,0 +1,13 @@
+<a data-toggle="modal" data-target=".{{item.name}}">{{item.name}}</a>
+<button class="btn btn-xs btn-info" ng-click="hide(item)">
+    {{getHideText(item)}}
+</button>
+
+<edit-modal target="{{item.name}}"
+            object="item">
+</edit-modal>
+
+<ul ng-hide="item.hide">
+    <li ng-repeat="item in item.children"
+        ng-include="'features/project/list/children.html'"></li>
+</ul>

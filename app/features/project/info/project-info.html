@@ -93,7 +93,6 @@
 
                 <!-- overview scatter plot data (demo) -->
                 <div ng-switch-when="Summary">
-
                     <div class="radio">
                         <label>
                             <input type="radio" name="diagram"
@@ -126,10 +125,14 @@
                         <div ng-switch-when="radial">
                             <radial-diagram data="circlePack"></radial-diagram>
                         </div>
-
                     </div>
+                </div>
 
-
+                <div ng-switch-when="Edit">
+                    <ul>
+                        <li ng-repeat="item in circlePack.children"
+                            ng-include="'features/project/list/children.html'"></li>
+                    </ul>
                 </div>
 
                 <div ng-switch-when="Run">

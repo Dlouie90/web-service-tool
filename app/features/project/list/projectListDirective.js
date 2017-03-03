@@ -1,13 +1,17 @@
-/**
- * Created by shay on 10/12/16.
- */
-
 angular.module("WebserviceApp.Directives")
 
     .directive("projectList", function () {
 
         return {
-            restrict: "E",
+            restrict   : "E",
             templateUrl: "features/project/list/project-list.html",
+        }
+    })
+
+    .directive("editModal", function () {
+        return {
+            restrict   : "E",
+            scope      : {target: "@", object: "="},
+            templateUrl: "features/project/list/template.html"
         }
     });
