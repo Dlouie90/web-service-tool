@@ -313,7 +313,7 @@ Graph.prototype.circleMouseUp = function (d3node, d) {
 
         // if the edge is not a duplicate, add it to the graph
         if (!filtRes[0].length) {
-            mouseDownNode.neighbors.push(d);
+            d.neighbors.push(mouseDownNode);
             thisGraph.edges.push(newEdge);
             thisGraph.updateGraph();
         }
