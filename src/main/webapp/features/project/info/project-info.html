@@ -34,6 +34,28 @@
             <div ng-switch on="selectedTopic">
 
                 <div ng-switch-when="Graph">
+				<div id="node-form" title="Edit a node" style="display:none">
+				<form>
+					<fieldset>
+					<label for="name">Name</label>
+					<input type="text" name="name" id="node-name" value="" class="text ui-widget-content ui-corner-all"> <br />
+					<label for="service">Service</label>
+					<input type="text" name="service" id="service" value="" class="text ui-widget-content ui-corner-all"> <br />
+					<label>Param names</label>
+					<div id="neighbor-names"></div>
+					<input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+					</fieldset>
+				</form>
+				</div>
+				<div id="edge-form" title="Edit an edge" style="display:none">
+				<form>
+					<fieldset>
+						  <label for="name">Name</label>
+						  <input type="text" name="name" id="edge-name" value="" class="text ui-widget-content ui-corner-all"> <br />
+						  <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+					</fieldset>
+				</form>
+				</div>
                     <!-- =============== PROJECT GRAPH OPTIONS =============== -->
                     <div class="btn-group" role="group" aria-label="...">
                         <!-- reset btn -->
@@ -139,6 +161,8 @@
                     <dl class="dl-horizontal">
                         <dt>Total Execution Time</dt>
                         <dd>{{serviceResult}}</dd>
+                        <dt>Debug JSON</dt>
+                        <dd>{{graphJSON}}</dd>
                     </dl>
                 </div>
 

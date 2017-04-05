@@ -326,65 +326,64 @@ angular.module("WebserviceApp.Services")
             },
 
             /** Return graph formatted in Adam's format */
-            getProjectJSON() {
-                let nds = [];
-                let endNodes = [];
-                for (let i = 0; i < activeProject.currentNodes.length; i++) {
-                    if (activeProject.currentNodes[i].isOutput) {
-                        for(let j = 0; j < activeProject.currentNodes[i].neighbors.length; j++) {
-                            endNodes.push(activeProject.currentNodes[i].neighbors[j].id);
-                        }
-                    } 
-                    else if (!activeProject.currentNodes[i].isInput) {
-                        nds.push(getNodeJSON(activeProject.currentNodes[i]))
-                    }
-                }
-                return {
-                    id       : Date.now(), //this is bad but whatever, just a temporary prototype until we've got something better
-                    name     : "Graph's name", //dunno where you're storing this, Shay
-                    timestamp: Date.now(),
-                    type     : "graph",
-                    ends     : endNodes,
-                    nodes    : nds
-                };
-            },
-            getNodeJSON(nd) {
-                let pars = [];
-                for (let i = 0; i < nd.neighbors.length; i++) {
-                    if(nd.neighbors[i].isInput) {
-                        pars.push({
-                            type    : "const",
-                            name    : "notimplementedyet",
-                            value   : "notimplementedyet"
-                        });
-                    } else {
-                        pars.push({
-                            type: "service",
-                            name: "notimplementedyet",
-                            from: nd.neighbors[i].id
-                        });
-                    }
-                }
-                if (nd.children.length == 0) { //if the node is a leaf
-                    return {
-                        id      : nd.id,
-                        type    : "service",
-                        url     : "http://www.example.com/notimplementedyet",
-                        params  : pars
-                    };
-                } else { //composite node
-                    let nds = [];
-                    for (let i = 0; i < nd.children.length; i++) {
-                        nds.push(getNodeJSON(nd.children[i]));
-                    }
-                    return {
-                        id      : nd.id,
-                        type    : "graph",
-                        nodes   : nds,
-                        params  : pars
-                    };
-
-                }
-            }
+			getProjectJSON() {
+				function getNodeJSON(nd) {
+					let pars = [];
+					for (let i = 0; i < nd.neighbors.length; i++) {
+						if(nd.neighbors[i].isInput) {
+							pars.push({
+								type    : "const",
+								name    : (typeof nd.paramnames != undefined && typeof nd.paramnames[nd.neighbors[i].id] != undefined) ? nd.paramnames[nd.neighbors[i].id] : "",
+								value   : "1" //wow, that's lazy! Why are you so lazy, Adam?
+							});
+						} else {
+							pars.push({
+								type: "real",
+								name: (typeof nd.paramnames != undefined && typeof nd.paramnames[nd.neighbors[i].id] != undefined) ? nd.paramnames[nd.neighbors[i].id] : "",
+								from: nd.neighbors[i].id
+							});
+						}
+					}
+					if (nd.children.length == 0) { //if the node is a leaf
+						return {
+							id      : nd.id,
+							type    : "service",
+							url     : nd.url.startsWith("http://") ? nd.url : "http://"+nd.url,
+							params  : pars
+						};
+					} else { //composite node
+						let nds = [];
+						for (let i = 0; i < nd.children.length; i++) {
+							nds.push(getNodeJSON(nd.children[i]));
+						}
+						return {
+							id      : nd.id,
+							type    : "graph",
+							nodes   : nds,
+							params  : pars
+						};
+					}
+				}
+				let nds = [];
+				let endNodes = [];
+				for (let i = 0; i < activeProject.currentNodes.length; i++) {
+					if (activeProject.currentNodes[i].isOutput) {
+						for(let j = 0; j < activeProject.currentNodes[i].neighbors.length; j++) {
+							endNodes.push(activeProject.currentNodes[i].neighbors[j].id);
+						}
+					} 
+					else if (!activeProject.currentNodes[i].isInput) {
+						nds.push(getNodeJSON(activeProject.currentNodes[i]))
+					}
+				}
+				return {
+					id       : Date.now(), //this is bad but whatever, just a temporary prototype until we've got something better
+					name     : "Graph's name", //dunno where you're storing this, Shay
+					timestamp: Date.now(),
+					type     : "graph",
+					ends     : endNodes,
+					nodes    : nds
+				};
+			}
         }
     });

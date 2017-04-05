@@ -19,7 +19,7 @@ public class Graph extends Node {
 	public Graph(JsonObject json, Graph context) throws Exception {
 		super(json, context);
 		nodes = new HashSet<Node>();
-		if(json.has("timestamp")) this.timestamp = new SimpleDateFormat("yyy-mm-dd").parse(json.get("timestamp").getAsString());
+		if(json.has("timestamp")) this.timestamp = new java.util.Date(json.get("timestamp").getAsLong());
 		if(json.has("name")) this.name = json.get("name").getAsString();
 		if(json.has("nodes")) {
 			for(JsonElement nod : json.get("nodes").getAsJsonArray()) {
@@ -49,7 +49,7 @@ public class Graph extends Node {
 	public JsonObject toJson() {
 		JsonObject js = super.toJson();
 		js.addProperty("type", "graph");
-		js.addProperty("timestamp", new SimpleDateFormat("yyy-mm-dd").format(timestamp));
+		js.addProperty("timestamp", timestamp.getTime());
 		js.addProperty("name", name);
 		if(!outs.isEmpty()) {
 			js.add("ends", new JsonArray());

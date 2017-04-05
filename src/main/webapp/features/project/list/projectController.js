@@ -166,19 +166,27 @@ angular.module("WebserviceApp.Controllers")
 
 
             $scope.runService = () => {
-                const url = "http://localhost:3000/api/run";
+				var proj = ProjectFactory.getProjectJSON();
+                $http.post("./rest/ws/addws", proj) //update the graph on the server...
+                    .then(result => { 
+                        $http.get("./rest/ws/callws",{ params : { ws : proj.id } }) //then call it
+							.then(result => {
+								$scope.serviceResult = result
+							})
+							.catch(error => {
+								console.log("failed to get");
+								console.log(error);
 
-                $http.post(url, ProjectFactory.getParsedNodes())
-                    .then(result => {
-                        $scope.serviceResult = result;
+								$scope.serviceResult = error;
+							});
                     })
                     .catch(error => {
-                        console.log("failed");
+                        console.log("failed to post");
                         console.log(error);
 
                         $scope.serviceResult = error;
                     });
-
+				$scope.graphJSON = proj;
             };
 
             /* =============== NON $SCOPE FUNCTIONS =============== */

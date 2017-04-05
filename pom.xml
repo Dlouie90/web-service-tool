@@ -72,7 +72,7 @@
                     <url>http://localhost:8080</url>
                     <server>localhost</server>
                     <path>/webservice</path>
-                </configuration>                
+                </configuration>
             </plugin>            
         </plugins>
     </build>

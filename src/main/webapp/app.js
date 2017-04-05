@@ -19,19 +19,19 @@ angular.module("WebserviceApp")
 
 
         $routeProvider.when("/project", {
-            templateUrl: "/views/project.html"
+            templateUrl: "/webservice/views/project.html"
         });
 
         $routeProvider.when("/about", {
-            templateUrl: "/views/about.html"
+            templateUrl: "/webservice/views/about.html"
         });
 
         $routeProvider.when("/contact", {
-            templateUrl: "/views/contact.html"
+            templateUrl: "/webservice/views/contact.html"
         });
 
         $routeProvider.otherwise({
-            templateUrl: "/views/project.html"
+            templateUrl: "/webservice/views/project.html"
         });
     });
 

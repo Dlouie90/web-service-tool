@@ -24,7 +24,7 @@ public class TestGraphs {
 		String someJson = "";
 		String linebuffer = "";
 		try {
-			BufferedReader file = new BufferedReader(new FileReader("ex.json"));
+			BufferedReader file = new BufferedReader(new FileReader("1491386270849.json"));
 			linebuffer = file.readLine();
 			while(linebuffer != null) {
 				someJson += linebuffer;

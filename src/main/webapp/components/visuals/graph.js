@@ -59,10 +59,10 @@ function parseData(nodeArray) {
     for (let node of nodes) {
         for (let neighbor of node.neighbors) {
             edges.push({
-                source: node,
+                source: findNeighbor(nodes, neighbor),
                 /* Same reasoning as above. We want to ensure the neighbor node
                  * is the same node in memory as the node in the nodes array. */
-                target: findNeighbor(nodes, neighbor)
+                target: node
             })
         }
     }
@@ -425,12 +425,12 @@ Graph.prototype.svgKeyDown = function () {
 function removeEdge(nodes, edge) {
     /* This is the source node that is in the nodes array. */
     const node = nodes.filter(currentNode => {
-        return currentNode.id == edge.source.id;
+        return currentNode.id == edge.target.id;
     }) [0];
 
     /* Remove the target node from the node neighbors field. */
     node.neighbors = node.neighbors.filter(currentNode => {
-        return currentNode.id != edge.target.id;
+        return currentNode.id != edge.source.id;
     });
 }
 
@@ -497,7 +497,7 @@ Graph.defaultState = function () {
 
     /* There should be an edge between the input and a regular node, and
      * another between the regular and the output.*/
-    input.neighbors.push(output);
+    output.neighbors.push(input);
 
     /* Default state with no parentNode. */
     return new State([input, output]);
@@ -507,8 +507,6 @@ Graph.defaultState = function () {
 function copyObject(object) {
     return JSON.parse(JSON.stringify(object));
 }
-
-
 /* =============== MAIN FUNCTION  =============== */
 
 /**
@@ -620,4 +618,71 @@ Graph.prototype.updateGraph = function () {
 
     // remove old nodes;
     thisGraph.circles.exit().remove();
+	
+	//activate or reactivate contextmenu dialogs
+	/*paths.on("contextmenu", function(d,i) {
+		$("#edge-name").val(d.name);
+		$("#edge-form").dialog({
+			  autoOpen: true,
+			  height: 400,
+			  width: 350,
+			  modal: true,
+			  buttons: {
+				"Save": function() {
+					d.name = $("#edge-name").val();
+					$("#edge-form").dialog( "close" );
+				},
+				Cancel: function() {
+				  $("#edge-form").dialog( "close" );
+				}
+			  },
+			  close: function() {
+				$("#edge-form > form")[0].reset();
+			  }
+		});
+	});*/
+	newGs.on("contextmenu", function(d,i) {
+		console.log(d);
+		$("#node-name").val(d.id);
+		$("#service").val(d.url);
+		if (typeof d.paramnames == 'undefined') {
+			for(var neighbor in d.neighbors) {
+				$("#neighbor-names").append('<span>' + d.neighbors[neighbor].id + '</span><input type="text" name="param" data-neighbor="' + d.neighbors[neighbor].id + '" value="" class="text ui-widget-content ui-corner-all paramname"><br/>');
+			}
+		} else {
+			for(var neighbor in d.neighbors) {
+				if (typeof d.paramnames[d.neighbors[neighbor].id] == 'undefined') {
+					$("#neighbor-names").append('<span>' + d.neighbors[neighbor].id + '</span><input type="text" name="param" data-neighbor="' + d.neighbors[neighbor].id + '" value="" class="text ui-widget-content ui-corner-all paramname"><br/>');
+				} else {
+					$("#neighbor-names").append('<span>' + d.neighbors[neighbor].id + '</span><input type="text" name="param" data-neighbor="' + d.neighbors[neighbor].id + '" value="' + d.paramnames[d.neighbors[neighbor].id] + '" class="text ui-widget-content ui-corner-all paramname"><br/>');
+				}
+			}
+		}
+		$("#node-form").dialog({
+			  autoOpen: true,
+			  height: 400,
+			  width: 350,
+			  modal: true,
+			  buttons: {
+				"Save": function() {
+					d.id = $("#node-name").val();
+					d.url = $("#service").val();
+					if (typeof d.paramnames == 'undefined') {
+						d.paramnames = {};
+					}
+					$(".paramname").each(function() {
+						d.paramnames[$(this).data("neighbor")] = $(this).val();
+					});
+					$("#node-form").dialog( "close" );
+				},
+				Cancel: function() {
+				  $("#node-form").dialog( "close" );
+				}
+			  },
+			  close: function() {
+				$("#neighbor-names").html("");
+				$("#node-form > form")[0].reset();
+			  }
+		});
+	});
 };

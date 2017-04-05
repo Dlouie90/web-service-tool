@@ -14,7 +14,7 @@ import javax.ws.rs.core.MediaType;
 import com.google.gson.Gson;
 
 @Path("/numbers")
-public class Example  {
+public class Example {
 	
 	//ex: http://localhost:8080/webservice/v1/numbers/random?num=10
     @GET
@@ -32,7 +32,6 @@ public class Example  {
     	List<Integer> alist = new ArrayList<Integer>();
     	for(int i = 0; i < num; i++) {
     		alist.add((int) (100*Math.random()));
-    		System.out.println(Math.random());
     	}
     	return gson.toJson(alist);
         //return gson.toJson(gson); //this is pretty neat.
